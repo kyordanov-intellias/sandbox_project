@@ -1,0 +1,20 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load the root .env file
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
+
+export const configFile = {
+    port: process.env.AUTH_SERVICE_PORT || 4001,
+    database: {
+        host: process.env.AUTH_SERVICE_DB_HOST || 'localhost',
+        port: parseInt(process.env.AUTH_SERVICE_DB_PORT || '5432'),
+        username: process.env.AUTH_SERVICE_DB_USER || 'postgres',
+        password: process.env.AUTH_SERVICE_DB_PASSWORD || 'postgres',
+        database: process.env.AUTH_SERVICE_DB_NAME || 'auth_db'
+    },
+    jwt: {
+        secret: process.env.AUTH_SERVICE_JWT_SECRET || 'your-auth-secret-key',
+        expiresIn: process.env.JWT_EXPIRATION || '24h'
+    }
+}; 
