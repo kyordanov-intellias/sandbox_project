@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   gateway:
     build:
@@ -45,6 +43,13 @@ services:
       - POSTGRES_DB=auth_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    container_name: auth_redis
+    restart: always
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:

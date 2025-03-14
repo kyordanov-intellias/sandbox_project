@@ -7,8 +7,8 @@ import { redisClient } from "../../config/redis";
 interface RegisterRequest {
   email: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface LoginRequest {
@@ -20,6 +20,19 @@ export class AuthController {
   async register(ctx: Context) {
     const { email, password, firstName, lastName } = ctx.request
       .body as RegisterRequest;
+
+    const requiredFields = ["email", "password", "firstName", "lastName"];
+
+    const validationFields = userRepository.validateRequestBody(
+      ctx.request.body!,
+      requiredFields
+    );
+
+    if (validationFields) {
+      ctx.status = 400;
+      ctx.body = validationFields;
+      return;
+    }
 
     try {
       const existingUser = await userRepository.findByEmail(email);
@@ -46,6 +59,18 @@ export class AuthController {
 
   async login(ctx: Context) {
     const { email, password } = ctx.request.body as LoginRequest;
+    const requiredFields = ["email", "password"];
+
+    const validationError = userRepository.validateRequestBody(
+      ctx.request.body!,
+      requiredFields
+    );
+
+    if (validationError) {
+      ctx.status = 400;
+      ctx.body = validationError;
+      return;
+    }
 
     try {
       const user = await userRepository.findByEmail(email);
@@ -71,7 +96,7 @@ export class AuthController {
         { expiresIn: configFile.jwt.expiresIn } as SignOptions
       );
 
-      await redisClient.set(`auth_token:${user.id}`, token, 'EX', 86400);
+      await redisClient.set(`auth_token:${user.id}`, token, "EX", 86400);
 
       ctx.body = { token };
     } catch (error) {
