@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 
-// Define User type
 interface User {
   id: number;
   email: string;
@@ -23,12 +22,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch user from backend
   const fetchUser = async () => {
     try {
       const response = await fetch("http://localhost:4001/auth/me", {
         method: "GET",
-        credentials: "include", // ✅ Important to send cookies
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -51,16 +49,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         method: "POST",
         credentials: "include",
       });
-
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
+      setUser(null);
     }
   };
 
   useEffect(() => {
     fetchUser();
-  }, [user]);
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, loading, fetchUser, logout }}>

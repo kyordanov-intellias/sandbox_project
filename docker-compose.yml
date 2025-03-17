@@ -53,6 +53,24 @@ services:
       - redis
     tty: true
 
+  user-service:
+    build:
+      context: ./server/services/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "${USER_SERVICE_PORT:-4002}:${USER_SERVICE_PORT:-4002}"
+    volumes:
+      - ./server/services/user-service:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    command: npx ts-node-dev --respawn --transpile-only --poll src/index.ts
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - postgres
+    tty: true
+
   # Databases and Caches
   postgres:
     image: postgres:latest

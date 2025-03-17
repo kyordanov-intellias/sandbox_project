@@ -4,12 +4,12 @@ import { useUser } from "../../context/UserContext";
 import "./Login.styles.css";
 
 const Login = () => {
+  const { fetchUser } = useUser();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const { fetchUser } = useUser();
 
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -43,6 +43,7 @@ const Login = () => {
         setError(data.error || "Login failed!");
       }
     } catch (error) {
+      console.error("Login error:", error);
       setError("An error occurred. Please try again.");
     }
   };
