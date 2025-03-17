@@ -14,6 +14,10 @@ class UserRepository {
     return this.repository.findOne({ where: { email } });
   }
 
+  async findById(userId: number): Promise<User | null> {
+    return this.repository.findOne({ where: { id: userId } });
+  }
+
   async create(
     email: string,
     password: string,

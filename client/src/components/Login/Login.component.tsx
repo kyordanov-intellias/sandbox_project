@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 import "./Login.styles.css";
 
 const Login = () => {
@@ -7,6 +8,8 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  const { fetchUser } = useUser();
 
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -28,11 +31,13 @@ const Login = () => {
           email: formData.email,
           password: formData.password,
         }),
+        credentials: "include",
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        fetchUser();
         navigate("/home");
       } else {
         setError(data.error || "Login failed!");

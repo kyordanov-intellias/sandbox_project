@@ -76,7 +76,7 @@ export class AuthController {
       const user = await userRepository.findByEmail(email);
       if (!user) {
         ctx.status = 401;
-        ctx.body = { error: "Invalid credentials" };
+        ctx.body = { error: "No such user with that email" };
         return;
       }
 
@@ -86,7 +86,7 @@ export class AuthController {
       );
       if (!isValidPassword) {
         ctx.status = 401;
-        ctx.body = { error: "Invalid credentials" };
+        ctx.body = { error: "Invalid password" };
         return;
       }
 
@@ -112,8 +112,51 @@ export class AuthController {
     }
   }
 
-  async test(ctx: Context) {
-    ctx.body = { message: "Auth service is running" };
+  async logout(ctx: Context) {
+    ctx.cookies.set("authToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      expires: new Date(0),
+    });
+
+    ctx.body = { message: "Logged out successfully" };
+  }
+
+  async getUserByToken(ctx: Context) {
+    try {
+      const token = ctx.cookies.get("authToken");
+
+      if (!token) {
+        ctx.status = 401;
+        ctx.body = { error: "Unauthorized - No token provided" };
+        return;
+      }
+
+      let decoded;
+      try {
+        decoded = jwt.verify(token, configFile.jwt.secret) as {
+          userId: number;
+        };
+      } catch (error) {
+        ctx.status = 401;
+        ctx.body = { error: "Unauthorized - Invalid token" };
+        return;
+      }
+
+      const user = await userRepository.findById(decoded.userId);
+      if (!user) {
+        ctx.status = 404;
+        ctx.body = { error: "User not found" };
+        return;
+      }
+
+      const { password, ...userWithoutPassword } = user;
+      ctx.body = userWithoutPassword;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Internal server error" };
+    }
   }
 }
 

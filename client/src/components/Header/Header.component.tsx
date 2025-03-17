@@ -1,14 +1,9 @@
-import { FC, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../../context/UserContext"; // Import useUser hook
 import "./Header.styles.css"; // Import the CSS file for Header
 
-interface User {
-  profilePic: string;
-  name: string;
-}
-
 const Header = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, logout } = useUser();
   return (
     <header>
       {/* Navigation Links */}
@@ -27,8 +22,11 @@ const Header = () => {
       <div className="user-menu">
         {user ? (
           <>
-            <img src={user.profilePic} alt="User Profile" />
-            <Link to="/profile">{user.name}</Link>
+            <p>
+              {user.firstName} {user.lastName}
+            </p>
+            <Link to="/profile">{user.email}</Link>
+            <button onClick={logout}>Logout</button>
           </>
         ) : (
           <Link to="/login">Login</Link>
