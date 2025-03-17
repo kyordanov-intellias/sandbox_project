@@ -1,27 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
   server: {
-    host: true,
-    port: 5173,
+    host: "0.0.0.0", // Allows access from outside the container
+    port: 5173, // Ensure it matches docker-compose
     strictPort: true,
     watch: {
-      usePolling: true
-    },
-    proxy: {
-      '/api': {
-        target: 'http://gateway:4000',
-        changeOrigin: true,
-      },
+      usePolling: true, // Ensures hot reload works properly in Docker
     },
   },
-}) 
+});

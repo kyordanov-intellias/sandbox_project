@@ -1,8 +1,8 @@
-import Koa from 'koa';
-import cors from '@koa/cors';
-import bodyParser from 'koa-bodyparser';
-import Router from 'koa-router';
-import { configFile } from '../config/config';
+import Koa from "koa";
+import cors from "@koa/cors";
+import bodyParser from "koa-bodyparser";
+import Router from "koa-router";
+import { configFile } from "../config/config";
 
 const app = new Koa();
 const router = new Router();
@@ -12,17 +12,18 @@ app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-
-router.get('/health', async (ctx) => {
-    ctx.body = { status: 'ok' };
+router.get("/health", async (ctx) => {
+  ctx.body = {
+    status: "ok",
+    message: "Gateway service is running",
+  };
 });
 
-router.all('/auth/(.*)', async (ctx) => {
-    ctx.body = { message: 'Auth service route' };
+router.all("/auth/(.*)", async (ctx) => {
+  ctx.body = { message: "Auth service route" };
 });
-
 
 const PORT = configFile.port;
 app.listen(PORT, () => {
-    console.log(`✅ Gateway service is running on port ${PORT}`);
+  console.log(`✅ Gateway service is running on port ${PORT}`);
 });

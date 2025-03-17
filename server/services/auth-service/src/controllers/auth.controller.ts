@@ -18,10 +18,10 @@ interface LoginRequest {
 
 export class AuthController {
   async register(ctx: Context) {
-    const { email, password, firstName, lastName } = ctx.request
+    const { firstName, lastName, email, password } = ctx.request
       .body as RegisterRequest;
 
-    const requiredFields = ["email", "password", "firstName", "lastName"];
+    const requiredFields = ["firstName", "lastName", "email", "password"];
 
     const validationFields = userRepository.validateRequestBody(
       ctx.request.body!,
@@ -97,6 +97,13 @@ export class AuthController {
       );
 
       await redisClient.set(`auth_token:${user.id}`, token, "EX", 86400);
+
+      ctx.cookies.set("authToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
 
       ctx.body = { token };
     } catch (error) {

@@ -1,0 +1,50 @@
+/* User Menu Container */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+}
+
+/* Profile Image */
+.user-menu img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: transform 0.3s ease; /* Image hover effect */
+}
+
+/* Profile Image Hover Effect */
+.user-menu img:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+/* User Name */
+.user-menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* User Name Hover Effect */
+.user-menu a:hover {
+  color: #ffeb3b; /* Yellow color when hovered */
+}
+
+/* Login Link (When User is Not Logged In) */
+.user-menu .login-link {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.user-menu .login-link:hover {
+  color: #ffeb3b; /* Yellow color when hovered */
+}

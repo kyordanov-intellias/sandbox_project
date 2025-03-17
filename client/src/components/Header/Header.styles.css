@@ -1,0 +1,73 @@
+/* Header Container */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #007bff; /* Blue background */
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease; /* Smooth transition */
+}
+
+nav a:hover {
+  color: #ffeb3b; /* Yellow color when hovered */
+}
+
+input[type="text"] {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  min-width: 200px;
+  background-color: #ffffff; /* White background for the input */
+  color: #333; /* Dark text for contrast */
+  transition: border-color 0.3s ease; /* Smooth transition */
+}
+
+input[type="text"]:focus {
+  border: 2px solid #ffeb3b; /* Yellow border on focus */
+  box-shadow: 0 0 5px rgba(255, 235, 59, 0.6); /* Glowing effect */
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-menu img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: transform 0.3s ease; /* Image hover effect */
+}
+
+.user-menu img:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.user-menu a {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.user-menu a:hover {
+  color: #ffeb3b;
+}
