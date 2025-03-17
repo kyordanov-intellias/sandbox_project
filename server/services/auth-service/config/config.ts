@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: path.join(__dirname, "../../../.env") });
+dotenv.config({ path: path.join(__dirname, "../../../../.env") });
 
 export const configFile = {
   port: process.env.AUTH_SERVICE_PORT || 4001,

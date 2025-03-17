@@ -2,7 +2,7 @@ import { Context } from "koa";
 import { userRepository } from "../repositories/user.repository";
 import { configFile } from "../../config/config";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { redisClient } from "../../config/redis";
+import redis from '../../config/redis';
 
 interface RegisterRequest {
   email: string;
@@ -96,7 +96,7 @@ export class AuthController {
         { expiresIn: configFile.jwt.expiresIn } as SignOptions
       );
 
-      await redisClient.set(`auth_token:${user.id}`, token, "EX", 86400);
+      await redis.set(`auth_token:${user.id}`, token, "EX", 86400);
 
       ctx.cookies.set("authToken", token, {
         httpOnly: true,
@@ -113,14 +113,26 @@ export class AuthController {
   }
 
   async logout(ctx: Context) {
-    ctx.cookies.set("authToken", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      expires: new Date(0),
-    });
+    try {
+      const token = ctx.cookies.get('authToken');
+      
+      if (token) {
+        await redis.set(`bl_${token}`, '1', 'EX', 24 * 60 * 60);
+      }
 
-    ctx.body = { message: "Logged out successfully" };
+      ctx.cookies.set('authToken', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 0,
+        expires: new Date(0)
+      });
+      ctx.status = 200;
+      ctx.body = { message: 'Successfully logged out' };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { message: 'Error during logout' };
+    }
   }
 
   async getUserByToken(ctx: Context) {
