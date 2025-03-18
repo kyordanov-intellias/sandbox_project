@@ -2,13 +2,14 @@ import { Context } from "koa";
 import { userRepository } from "../repositories/user.repository";
 import { configFile } from "../../config/config";
 import jwt, { SignOptions } from "jsonwebtoken";
-import redis from '../../config/redis';
+import redis from "../../config/redis";
 
 interface RegisterRequest {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
+  userRole: string;
 }
 
 interface LoginRequest {
@@ -18,10 +19,16 @@ interface LoginRequest {
 
 export class AuthController {
   async register(ctx: Context) {
-    const { firstName, lastName, email, password } = ctx.request
+    const { firstName, lastName, email, password, userRole } = ctx.request
       .body as RegisterRequest;
 
-    const requiredFields = ["firstName", "lastName", "email", "password"];
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "password",
+      "userRole",
+    ];
 
     const validationFields = userRepository.validateRequestBody(
       ctx.request.body!,
@@ -46,7 +53,8 @@ export class AuthController {
         email,
         password,
         firstName,
-        lastName
+        lastName,
+        userRole
       );
 
       const { password: _, ...userWithoutPassword } = user;
@@ -114,24 +122,24 @@ export class AuthController {
 
   async logout(ctx: Context) {
     try {
-      const token = ctx.cookies.get('authToken');
-      
+      const token = ctx.cookies.get("authToken");
+
       if (token) {
-        await redis.set(`bl_${token}`, '1', 'EX', 24 * 60 * 60);
+        await redis.set(`bl_${token}`, "1", "EX", 24 * 60 * 60);
       }
 
-      ctx.cookies.set('authToken', '', {
+      ctx.cookies.set("authToken", "", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         maxAge: 0,
-        expires: new Date(0)
+        expires: new Date(0),
       });
       ctx.status = 200;
-      ctx.body = { message: 'Successfully logged out' };
+      ctx.body = { message: "Successfully logged out" };
     } catch (error) {
       ctx.status = 500;
-      ctx.body = { message: 'Error during logout' };
+      ctx.body = { message: "Error during logout" };
     }
   }
 

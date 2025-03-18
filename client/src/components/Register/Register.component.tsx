@@ -9,20 +9,22 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    userRole: "",
   });
 
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;
@@ -39,6 +41,7 @@ const Register = () => {
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
+          userRole: formData.userRole,
         }),
       });
 
@@ -102,6 +105,21 @@ const Register = () => {
             onChange={handleChange}
             required
           />
+          <label htmlFor="userRole">Choose a role:</label>
+          <select
+            name="userRole"
+            id="userRole"
+            value={formData.userRole}
+            onChange={handleChange}
+            required
+          >
+            <option value="">--Select a role--</option>
+            <option value="participant">Participant</option>
+            <option value="speaker">Speaker</option>
+            <option value="mentor">Mentor</option>
+            <option value="coordinator">Coordinator</option>
+            <option value="admin">Admin</option>
+          </select>
 
           {error && <p className="error-text">{error}</p>}
           {successMessage && <p className="success-text">{successMessage}</p>}
