@@ -3,7 +3,7 @@ import { useState } from "react";
 import "./UserMenu.styles.css";
 
 const UserMenu = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Simulated Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <div className="user-menu">

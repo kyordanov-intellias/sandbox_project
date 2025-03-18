@@ -31,13 +31,13 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  background-color: #442828; /* Light background */
+  background-color: #442828;
   transition: border-color 0.3s ease;
 }
 
 .login-box input:focus {
   border-color: #007bff;
-  background-color: #000000; /* On focus, background turns white */
+  background-color: #000000;
   outline: none;
 }
 

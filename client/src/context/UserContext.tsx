@@ -24,7 +24,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUser = async () => {
     try {
-      const response = await fetch("http://localhost:4001/auth/me", {
+      const response = await fetch("http://localhost:4000/auth/me", {
         method: "GET",
         credentials: "include",
       });
@@ -45,7 +45,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:4001/auth/logout", {
+      await fetch("http://localhost:4000/auth/logout", {
         method: "POST",
         credentials: "include",
       });
@@ -67,7 +67,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// Custom hook to use UserContext
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (!context) {

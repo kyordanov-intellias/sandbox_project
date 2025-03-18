@@ -10,8 +10,8 @@ const app = new Koa();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow requests from your frontend
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: "http://localhost:5173",
+    credentials: true,
   })
 );
 app.use(bodyParser());

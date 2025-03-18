@@ -31,14 +31,14 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  background-color: #ffffff; /* Light background */
+  background-color: #ffffff;
   transition: border-color 0.3s ease;
   color: #000000;
 }
 
 .register-box input:focus {
   border-color: #007bff;
-  background-color: #686868; /* On focus, background turns white */
+  background-color: #686868;
   outline: none;
   color: #000000;
 }
