@@ -178,6 +178,61 @@ export class AuthController {
       ctx.body = { error: "Internal server error" };
     }
   }
+
+  async getUserByEmail(ctx: Context) {
+    const { email } = ctx.params as { email: string };
+
+    if (!email) {
+      ctx.status = 400;
+      ctx.body = { error: "Email is required" };
+      return;
+    }
+
+    try {
+      const existingUser = await userRepository.findByEmail(email);
+
+      if (existingUser) {
+        ctx.status = 200;
+        ctx.body = { user: existingUser };
+      } else {
+        ctx.status = 404;
+        ctx.body = { error: "User not found" };
+      }
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Internal server error" };
+      console.error("Error fetching user by email:", error);
+    }
+  }
+
+  async deleteUserByEmail(ctx: Context) {
+    const { email } = ctx.params as { email: string };
+
+    if (!email) {
+      ctx.status = 400;
+      ctx.body = { error: "Email is required" };
+      return;
+    }
+
+    try {
+      const existingUser = await userRepository.findByEmail(email);
+
+      if (!existingUser) {
+        ctx.status = 404;
+        ctx.body = { error: "User not found" };
+        return;
+      }
+
+      await userRepository.deleteByEmail(email);
+
+      ctx.status = 200;
+      ctx.body = { message: `User with email ${email} has been deleted.` };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Internal server error" };
+      console.error("Error deleting user by email:", error);
+    }
+  }
 }
 
 export const authController = new AuthController();
