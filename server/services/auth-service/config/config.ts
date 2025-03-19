@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(__dirname, "../../../../.env") });
 export const configFile = {
   port: process.env.AUTH_SERVICE_PORT || 4001,
   database: {
-    host: process.env.AUTH_SERVICE_DB_HOST || "postgres",
+    host: process.env.AUTH_SERVICE_DB_HOST || "postgres_auth",
     port: parseInt(process.env.AUTH_SERVICE_DB_PORT || "5432"),
     username: process.env.AUTH_SERVICE_DB_USER || "postgres",
     password: process.env.AUTH_SERVICE_DB_PASSWORD || "postgres",

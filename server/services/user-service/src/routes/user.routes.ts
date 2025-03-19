@@ -1,15 +1,11 @@
 import Router from "koa-router";
-import { Context } from "koa";
+import { getHealth, createUserProfile } from "../controllers/user.controller";
 
 const router = new Router({
   prefix: "/users",
 });
 
-router.get("/health", async (ctx: Context) => {
-  ctx.body = {
-    status: "ok",
-    message: "User service is running",
-  };
-});
+router.get("/health", getHealth);
+router.post("/", createUserProfile);
 
 export { router as userRouter };

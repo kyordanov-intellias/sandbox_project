@@ -15,6 +15,8 @@ services:
     container_name: frontend
     depends_on:
       - gateway
+    networks:
+      - app-network
 
   # Backend Services
   gateway:
@@ -36,6 +38,8 @@ services:
       - user-service
     container_name: gateway-service
     tty: true
+    networks:
+      - app-network
 
   auth-service:
     build:
@@ -53,9 +57,11 @@ services:
       - NODE_ENV=development
     container_name: auth-service
     depends_on:
-      - postgres
+      - postgres_auth
       - redis
     tty: true
+    networks:
+      - app-network
 
   user-service:
     build:
@@ -73,13 +79,15 @@ services:
       - NODE_ENV=development
     container_name: user-service
     depends_on:
-      - postgres
+      - postgres_user
     tty: true
+    networks:
+      - app-network
 
-  # Databases and Caches
-  postgres:
+  # PostgreSQL databases
+  postgres_auth:
     image: postgres:latest
-    container_name: postgres
+    container_name: postgres_auth
     restart: always
     ports:
       - "5433:5432"
@@ -89,7 +97,25 @@ services:
       POSTGRES_DB: auth_db
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_auth_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  postgres_user:
+    image: postgres:latest
+    container_name: postgres_user
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   redis:
     image: redis:latest
@@ -99,7 +125,14 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/var/lib/redis/data
+    networks:
+      - app-network
 
 volumes:
-  postgres_data:
+  postgres_auth_data:
+  postgres_user_data:
   redis_data:
+
+networks:
+  app-network:
+    driver: bridge
