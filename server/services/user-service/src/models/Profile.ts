@@ -1,16 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity("profiles")
+@Entity('profiles')
 export class Profile {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-  @Column({ unique: true, name: "user_id" })
-  userId!: number;
+  @Column({ unique: true })
+  auth_id!: string;
 
-  @Column({ nullable: true, name: "first_name" })
-  firstName!: string;
+  @Column()
+  email!: string;
 
-  @Column({ nullable: true, name: "last_name" })
-  lastName!: string;
+  @Column()
+  first_name!: string;
+
+  @Column()
+  last_name!: string;
+
+  @Column()
+  role!: string;
+
+  @CreateDateColumn()
+  created_at!: Date;
+
+  @UpdateDateColumn()
+  updated_at!: Date;
 }
