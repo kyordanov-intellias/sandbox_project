@@ -1,84 +1,111 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, FC } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../services/userServices";
 import { useUser } from "../../context/UserContext";
-import "./Login.styles.css";
+import { z } from "zod";
 
-const Login = () => {
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
+
+const Login: FC = () => {
   const { fetchUser } = useUser();
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<LoginForm>({
     email: "",
     password: "",
   });
-
-
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const response = await fetch("http://localhost:4000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-        credentials: "include",
-      });
-
+      loginSchema.parse(formData);
+      const response = await loginUser(formData);
       const data = await response.json();
 
       if (response.ok) {
         fetchUser();
         navigate("/home");
       } else {
-        setError(data.error || "Login failed!");
+        setErrors(data.error || "Login failed!");
       }
     } catch (error) {
-      console.error("Login error:", error);
-      setError("An error occurred. Please try again.");
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2 className="header">Login</h2>
-        <form onSubmit={handleSubmit}>
+    <div className="auth-container">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h2>Welcome Back</h2>
+
+        <div className="auth-toggle-container">
+          <button
+            type="button"
+            className="auth-toggle-button active"
+            onClick={() => {}}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            className="auth-toggle-button"
+            onClick={() => navigate("/register")}
+          >
+            Sign Up
+          </button>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
           <input
             type="email"
+            id="email"
             name="email"
-            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            required
+            placeholder="Enter your email"
           />
+          {errors.email && <div className="error-message">{errors.email}</div>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
           <input
             type="password"
+            id="password"
             name="password"
-            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            required
+            placeholder="Enter your password"
           />
-          {error && <p className="error-text">{error}</p>}
-
-          <button type="submit">Login</button>
-        </form>
-
-        <div className="signup-link">
-          <span>Don't have an account? </span>
-          <Link to={"/register"}>Sign Up Now</Link>
+          {errors.password && (
+            <div className="error-message">{errors.password}</div>
+          )}
         </div>
-      </div>
+
+        <button type="submit" className="auth-submit">
+          Login
+        </button>
+      </form>
     </div>
   );
 };

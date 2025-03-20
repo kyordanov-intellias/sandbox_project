@@ -128,6 +128,19 @@ services:
     networks:
       - app-network
 
+    # RabbitMQ service
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # RabbitMQ messaging port
+      - "15672:15672" # RabbitMQ management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app-network
+
 volumes:
   postgres_auth_data:
   postgres_user_data:
