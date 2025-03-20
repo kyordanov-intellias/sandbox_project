@@ -3,6 +3,7 @@ import { userRepository } from "../repositories/user.repository";
 import { configFile } from "../../config/config";
 import jwt, { SignOptions } from "jsonwebtoken";
 import redis from "../../config/redis";
+import { rabbitMQService } from "../services/rabbitmq.service";
 
 interface RegisterRequest {
   email: string;
@@ -49,7 +50,7 @@ export class AuthController {
         return;
       }
 
-      const user = await userRepository.create(
+      const newUser = await userRepository.create(
         email,
         password,
         firstName,
@@ -57,8 +58,20 @@ export class AuthController {
         userRole
       );
 
-      const { password: _, ...userWithoutPassword } = user;
-      ctx.body = userWithoutPassword;
+      await rabbitMQService.publishUserCreated({
+        id: newUser.id.toString(),
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        userRole: newUser.userRole
+      });
+
+      const { password: _, ...userWithoutPassword } = newUser;
+      ctx.status = 201;
+      ctx.body = {
+        message: 'User registered successfully',
+        user: userWithoutPassword
+      };
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: "Error creating user" };
