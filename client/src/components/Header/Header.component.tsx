@@ -1,33 +1,32 @@
+import { FC } from "react";
 import { Link } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
-import "./Header.styles.css"; 
+import { Home, MessageSquare, Users, User } from "lucide-react";
 
-const Header = () => {
-  const { user, logout } = useUser();
+const Header: FC = () => {
   return (
-    <header>
-      <nav>
-        <Link to="/home">Home</Link>
-        <Link to="/posts">Posts</Link>
-        <Link to="/messenger">Messenger</Link>
-      </nav>
+    <header className="header">
+      <div className="container header-container">
+        <Link to="/" className="nav-link">
+          <Home size={24} />
+        </Link>
 
-      <div>
-        <input type="text" placeholder="Search..." />
-      </div>
-
-      <div className="user-menu">
-        {user ? (
-          <>
-            <p>
-              {user.firstName} {user.lastName}
-            </p>
-            <Link to="/profile">{user.email}</Link>
-            <button onClick={logout}>Logout</button>
-          </>
-        ) : (
-          <Link to="/login">Login</Link>
-        )}
+        <nav className="nav-links">
+          <Link to="/posts" className="nav-link">
+            <Users size={20} />
+            Posts
+          </Link>
+          <Link to="/messenger" className="nav-link">
+            <MessageSquare size={20} />
+            Messenger
+          </Link>
+          <Link to="/profile" className="nav-link">
+            <User size={20} />
+            Profile
+          </Link>
+          <Link to="/register" className="join-button">
+            Join Now
+          </Link>
+        </nav>
       </div>
     </header>
   );

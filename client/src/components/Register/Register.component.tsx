@@ -1,137 +1,213 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Register.styles.css";
+import { useNavigate } from "react-router-dom";
+import { registerUser } from "../../services/userServices";
+import { z } from "zod";
 
-const Register = () => {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+const registerSchema = z
+  .object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+    firstName: z.string().min(2, "First name is required"),
+    lastName: z.string().min(2, "Last name is required"),
+    userRole: z.enum(["participant", "mentor", "administrator"]),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterForm = z.infer<typeof registerSchema>;
+
+const Register: React.FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<RegisterForm>({
     email: "",
     password: "",
     confirmPassword: "",
-    userRole: "",
+    firstName: "",
+    lastName: "",
+    userRole: "participant",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const getPasswordStrength = (
+    password: string
+  ): "weak" | "medium" | "strong" => {
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const score = [hasLower, hasUpper, hasNumber, hasSpecial].filter(
+      Boolean
+    ).length;
+
+    if (score <= 2) return "weak";
+    if (score === 3) return "medium";
+    return "strong";
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
-      return;
-    }
-
     try {
-      const response = await fetch("http://localhost:4000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          userRole: formData.userRole,
-        }),
-      });
-
+      registerSchema.parse(formData);
+      const response = await registerUser(formData);
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage("User created successfully!");
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       } else {
-        setError(data.error || "Registration failed!");
+        setErrors(data.error || "Registration failed!");
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
     }
   };
 
+  const passwordStrength = getPasswordStrength(formData.password);
+
   return (
-    <div className="register-container">
-      <div className="register-box">
-        <h2 className="header">Register</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
+    <div className="auth-container">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h2>Create Account</h2>
+
+        <div className="auth-toggle-container">
+          <button
+            type="button"
+            className="auth-toggle-button"
+            onClick={() => navigate("/login")}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            className="auth-toggle-button active"
+            onClick={() => {}}
+          >
+            Sign Up
+          </button>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
           <input
             type="email"
+            id="email"
             name="email"
-            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            required
+            placeholder="Enter your email"
           />
+          {errors.email && <div className="error-message">{errors.email}</div>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="Enter your first name"
+          />
+          {errors.firstName && (
+            <div className="error-message">{errors.firstName}</div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Enter your last name"
+          />
+          {errors.lastName && (
+            <div className="error-message">{errors.lastName}</div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
           <input
             type="password"
+            id="password"
             name="password"
-            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            required
+            placeholder="Create a password"
           />
+          {formData.password && (
+            <div className="password-strength">
+              <div className="strength-bar">
+                <div className={`strength-${passwordStrength}`} />
+              </div>
+              <small>Password strength: {passwordStrength}</small>
+            </div>
+          )}
+          {errors.password && (
+            <div className="error-message">{errors.password}</div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password</label>
           <input
             type="password"
+            id="confirmPassword"
             name="confirmPassword"
-            placeholder="Confirm Password"
             value={formData.confirmPassword}
             onChange={handleChange}
-            required
+            placeholder="Confirm your password"
           />
-          <label htmlFor="userRole">Choose a role:</label>
+          {errors.confirmPassword && (
+            <div className="error-message">{errors.confirmPassword}</div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="role">Role</label>
           <select
-            name="userRole"
-            id="userRole"
+            id="role"
+            name="role"
             value={formData.userRole}
             onChange={handleChange}
-            required
           >
-            <option value="">--Select a role--</option>
-            <option value="participant">Participant</option>
-            <option value="speaker">Speaker</option>
-            <option value="mentor">Mentor</option>
-            <option value="coordinator">Coordinator</option>
-            <option value="admin">Admin</option>
+            <option value="participant">Participant (Learner)</option>
+            <option value="mentor">Mentor/Instructor</option>
+            <option value="administrator">Administrator</option>
           </select>
-
-          {error && <p className="error-text">{error}</p>}
-          {successMessage && <p className="success-text">{successMessage}</p>}
-
-          <button type="submit">Register</button>
-        </form>
-
-        <div className="signup-link">
-          <span>Already have an account? </span>
-          <Link to={"/login"}>Sing In Now</Link>
+          {errors.userRole && (
+            <div className="error-message">{errors.userRole}</div>
+          )}
         </div>
-      </div>
+
+        <button type="submit" className="auth-submit">
+          Create Account
+        </button>
+      </form>
     </div>
   );
 };
