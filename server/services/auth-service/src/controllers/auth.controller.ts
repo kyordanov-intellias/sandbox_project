@@ -3,6 +3,7 @@ import { userRepository } from "../repositories/user.repository";
 import { configFile } from "../../config/config";
 import jwt, { SignOptions } from "jsonwebtoken";
 import redis from "../../config/redis";
+import { rabbitMQService } from "../services/rabbitmq.service";
 
 interface RegisterRequest {
   email: string;
@@ -49,7 +50,7 @@ export class AuthController {
         return;
       }
 
-      const user = await userRepository.create(
+      const newUser = await userRepository.create(
         email,
         password,
         firstName,
@@ -57,8 +58,20 @@ export class AuthController {
         userRole
       );
 
-      const { password: _, ...userWithoutPassword } = user;
-      ctx.body = userWithoutPassword;
+      await rabbitMQService.publishUserCreated({
+        id: newUser.id.toString(),
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        userRole: newUser.userRole
+      });
+
+      const { password: _, ...userWithoutPassword } = newUser;
+      ctx.status = 201;
+      ctx.body = {
+        message: 'User registered successfully',
+        user: userWithoutPassword
+      };
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: "Error creating user" };
@@ -176,6 +189,61 @@ export class AuthController {
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: "Internal server error" };
+    }
+  }
+
+  async getUserByEmail(ctx: Context) {
+    const { email } = ctx.params as { email: string };
+
+    if (!email) {
+      ctx.status = 400;
+      ctx.body = { error: "Email is required" };
+      return;
+    }
+
+    try {
+      const existingUser = await userRepository.findByEmail(email);
+
+      if (existingUser) {
+        ctx.status = 200;
+        ctx.body = { user: existingUser };
+      } else {
+        ctx.status = 404;
+        ctx.body = { error: "User not found" };
+      }
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Internal server error" };
+      console.error("Error fetching user by email:", error);
+    }
+  }
+
+  async deleteUserByEmail(ctx: Context) {
+    const { email } = ctx.params as { email: string };
+
+    if (!email) {
+      ctx.status = 400;
+      ctx.body = { error: "Email is required" };
+      return;
+    }
+
+    try {
+      const existingUser = await userRepository.findByEmail(email);
+
+      if (!existingUser) {
+        ctx.status = 404;
+        ctx.body = { error: "User not found" };
+        return;
+      }
+
+      await userRepository.deleteByEmail(email);
+
+      ctx.status = 200;
+      ctx.body = { message: `User with email ${email} has been deleted.` };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Internal server error" };
+      console.error("Error deleting user by email:", error);
     }
   }
 }

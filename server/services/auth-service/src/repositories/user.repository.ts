@@ -54,6 +54,10 @@ class UserRepository {
     }
     return null;
   }
+
+  async deleteByEmail(email: string): Promise<void> {
+    await this.repository.delete({ email });
+  }
 }
 
 export const userRepository = new UserRepository();
