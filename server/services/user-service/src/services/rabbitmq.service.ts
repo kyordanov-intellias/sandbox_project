@@ -14,26 +14,35 @@ export class RabbitMQService {
   private channel: any = null;
   private initialized = false;
 
+  private async connectWithRetry(retries = 5, interval = 5000): Promise<void> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        this.connection = await amqp.connect(rabbitmqConfig.url);
+        this.channel = await this.connection.createChannel();
+        return;
+      } catch (error) {
+        console.log(`Failed to connect to RabbitMQ (attempt ${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, interval));
+      }
+    }
+    throw new Error('Failed to connect to RabbitMQ after multiple retries');
+  }
+
   async initialize() {
     try {
-      // Connect to RabbitMQ
-      this.connection = await amqp.connect(rabbitmqConfig.url);
-      this.channel = await this.connection.createChannel();
+      await this.connectWithRetry();
 
-      // Setup exchange
       await this.channel.assertExchange(
         rabbitmqConfig.exchanges.user,
         "direct",
         { durable: true }
       );
 
-      // Setup queue
       const { queue } = await this.channel.assertQueue(
         rabbitmqConfig.queues.userCreated,
         { durable: true }
       );
 
-      // Bind queue to exchange
       await this.channel.bindQueue(
         queue,
         rabbitmqConfig.exchanges.user,
@@ -56,13 +65,11 @@ export class RabbitMQService {
     if (!this.initialized) {
       const queue = await this.initialize();
 
-      // Start consuming messages
       this.channel.consume(queue, async (msg: amqp.ConsumeMessage | null) => {
         if (msg) {
           try {
             const data = JSON.parse(msg.content.toString()) as UserCreatedEvent;
             await handleMessage(data);
-            // Acknowledge the message
             this.channel.ack(msg);
           } catch (error) {
             console.error("❌ Error processing message:", error);

@@ -11,14 +11,12 @@ interface UserCreatedEvent {
 export class UserHandlerService {
   async handleUserCreated(userData: UserCreatedEvent) {
     try {
-      // Check if profile already exists
       const existingProfile = await profileRepository.findByAuthId(userData.id);
       if (existingProfile) {
         console.log(`⚠️ Profile already exists for auth_id: ${userData.id}`);
         return;
       }
 
-      // Create new profile
       const profile = await profileRepository.create({
         auth_id: userData.id,
         email: userData.email,
