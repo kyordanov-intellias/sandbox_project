@@ -16,7 +16,6 @@ export class RabbitMQService {
 
   async initialize() {
     try {
-      // Connect to RabbitMQ
       this.connection = await amqp.connect(rabbitmqConfig.url);
       this.channel = await this.connection.createChannel();
 
