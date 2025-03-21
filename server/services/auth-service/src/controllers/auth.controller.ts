@@ -1,6 +1,6 @@
 import { Context } from "koa";
 import { userRepository } from "../repositories/user.repository";
-import { configFile } from "../../config/config";
+import { configAuthFile } from "../../config/config";
 import jwt, { SignOptions } from "jsonwebtoken";
 import redis from "../../config/redis";
 import { rabbitMQService } from "../services/rabbitmq.service";
@@ -22,6 +22,8 @@ export class AuthController {
   async register(ctx: Context) {
     const { firstName, lastName, email, password, userRole } = ctx.request
       .body as RegisterRequest;
+
+    //remove as (typeguard)
 
     const requiredFields = [
       "firstName",
@@ -63,14 +65,14 @@ export class AuthController {
         email: newUser.email,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
-        userRole: newUser.userRole
+        userRole: newUser.userRole,
       });
 
       const { password: _, ...userWithoutPassword } = newUser;
       ctx.status = 201;
       ctx.body = {
-        message: 'User registered successfully',
-        user: userWithoutPassword
+        message: "User registered successfully",
+        user: userWithoutPassword,
       };
     } catch (error) {
       ctx.status = 500;
@@ -113,8 +115,8 @@ export class AuthController {
 
       const token = jwt.sign(
         { userId: user.id, email: user.email },
-        configFile.jwt.secret,
-        { expiresIn: configFile.jwt.expiresIn } as SignOptions
+        configAuthFile.jwt.secret,
+        { expiresIn: configAuthFile.jwt.expiresIn } as SignOptions // type
       );
 
       await redis.set(`auth_token:${user.id}`, token, "EX", 86400);
@@ -137,6 +139,7 @@ export class AuthController {
     try {
       const token = ctx.cookies.get("authToken");
 
+      //check the logic
       if (token) {
         await redis.set(`bl_${token}`, "1", "EX", 24 * 60 * 60);
       }
@@ -157,6 +160,8 @@ export class AuthController {
   }
 
   async getUserByToken(ctx: Context) {
+    console.log(`GET USER BY TOKEN`);
+
     try {
       const token = ctx.cookies.get("authToken");
 
@@ -168,8 +173,8 @@ export class AuthController {
 
       let decoded;
       try {
-        decoded = jwt.verify(token, configFile.jwt.secret) as {
-          userId: number;
+        decoded = jwt.verify(token, configAuthFile.jwt.secret) as {
+          userId: string;
         };
       } catch (error) {
         ctx.status = 401;

@@ -1,8 +1,10 @@
 import { FC } from "react";
 import { Link } from "react-router-dom";
 import { Home, MessageSquare, Users, User } from "lucide-react";
+import { useUser } from "../../context/UserContext";
 
 const Header: FC = () => {
+  const { user, logout } = useUser();
   return (
     <header className="header">
       <div className="container header-container">
@@ -23,9 +25,14 @@ const Header: FC = () => {
             <User size={20} />
             Profile
           </Link>
-          <Link to="/register" className="join-button">
-            Join Now
-          </Link>
+
+          {!user ? (
+            <Link to="/register" className="join-button">
+              Join Now
+            </Link>
+          ) : (
+            <button onClick={logout}>Log out</button>
+          )}
         </nav>
       </div>
     </header>

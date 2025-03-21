@@ -35,7 +35,7 @@ const Login: FC = () => {
 
       if (response.ok) {
         fetchUser();
-        navigate("/home");
+        navigate("/");
       } else {
         setErrors(data.error || "Login failed!");
       }

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
+import { getUser, logoutUser } from "../services/userServices";
 
 interface User {
   id: number;
@@ -24,11 +25,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUser = async () => {
     try {
-      const response = await fetch("http://localhost:4000/auth/me", {
-        method: "GET",
-        credentials: "include",
-      });
-
+      const response = await getUser();
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
@@ -45,10 +42,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:4000/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await logoutUser();
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
@@ -58,7 +52,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, loading, fetchUser, logout }}>

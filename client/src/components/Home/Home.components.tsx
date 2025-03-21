@@ -13,7 +13,7 @@ const Home: FC = () => {
               Connect with mentors, share knowledge, and access educational
               resources in a dynamic, community-driven platform.
             </p>
-            <Link to="/register" className="cta-button">
+            <Link to="/login" className="cta-button">
               Start Learning
             </Link>
           </div>

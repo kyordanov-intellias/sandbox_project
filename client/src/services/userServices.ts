@@ -36,3 +36,19 @@ export const loginUser = async (formData: LoginUserInterface) => {
 
   return response;
 };
+
+export const getUser = async () => {
+  const response = await fetch("http://localhost:4000/auth/me", {
+    method: "GET",
+    credentials: "include",
+  });
+
+  return response;
+};
+
+export const logoutUser = async () => {
+  return await fetch("http://localhost:4000/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+};

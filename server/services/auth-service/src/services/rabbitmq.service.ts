@@ -1,6 +1,5 @@
-import amqp from 'amqplib';
-import { rabbitmqConfig } from '../../config/rabbitmq';
-
+import amqp from "amqplib";
+import { rabbitmqConfig } from "../../config/rabbitmq";
 
 interface UserCreatedEvent {
   id: string;
@@ -20,17 +19,16 @@ export class RabbitMQService {
       this.connection = await amqp.connect(rabbitmqConfig.url);
       this.channel = await this.connection.createChannel();
 
-
       await this.channel.assertExchange(
         rabbitmqConfig.exchanges.user,
-        'direct',
+        "direct",
         { durable: true }
       );
 
-      console.log('✅ Connected to RabbitMQ');
+      console.log("✅ Auth service connected to RabbitMQ");
       this.initialized = true;
     } catch (error) {
-      console.error('❌ RabbitMQ connection error:', error);
+      console.error("❌ RabbitMQ connection error:", error);
       throw error;
     }
   }
@@ -45,17 +43,19 @@ export class RabbitMQService {
         rabbitmqConfig.exchanges.user,
         rabbitmqConfig.routingKeys.userCreated,
         Buffer.from(JSON.stringify(userData)),
-        { 
+        {
           persistent: true,
-          contentType: 'application/json',
+          contentType: "application/json",
         }
       );
 
       if (success) {
-        console.log(`✅ Published user.created event for userId: ${userData.id}`);
+        console.log(
+          `✅ Published user.created event for userId: ${userData.id}`
+        );
       }
     } catch (error) {
-      console.error('❌ Error publishing user.created event:', error);
+      console.error("❌ Error publishing user.created event:", error);
       throw error;
     }
   }
@@ -69,11 +69,11 @@ export class RabbitMQService {
         await this.connection.close();
       }
       this.initialized = false;
-      console.log('✅ RabbitMQ connection closed');
+      console.log("✅ RabbitMQ connection closed");
     } catch (error) {
-      console.error('❌ Error closing RabbitMQ connection:', error);
+      console.error("❌ Error closing RabbitMQ connection:", error);
     }
   }
 }
 
-export const rabbitMQService = new RabbitMQService(); 
+export const rabbitMQService = new RabbitMQService();

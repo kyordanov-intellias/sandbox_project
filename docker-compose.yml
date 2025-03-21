@@ -59,6 +59,7 @@ services:
     depends_on:
       - postgres_auth
       - redis
+      - rabbitmq 
     tty: true
     networks:
       - app-network
@@ -80,6 +81,7 @@ services:
     container_name: user-service
     depends_on:
       - postgres_user
+      - rabbitmq
     tty: true
     networks:
       - app-network

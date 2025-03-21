@@ -1,8 +1,9 @@
 import Redis from "ioredis";
+import { configAuthFile } from "./config";
 
 const redis = new Redis({
-    host: process.env.REDIS_HOST || "redis",
-    port: parseInt(process.env.REDIS_PORT || "6379"),
+  host: configAuthFile.redis.host || "redis",
+  port: configAuthFile.redis.port || parseInt("6379"),
 });
 
 export default redis;

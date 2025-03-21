@@ -3,7 +3,7 @@ import path from "path";
 
 dotenv.config({ path: path.join(__dirname, "../../../../.env") });
 
-export const configFile = {
+export const configAuthFile = {
   port: process.env.AUTH_SERVICE_PORT || 4001,
   database: {
     host: process.env.AUTH_SERVICE_DB_HOST || "postgres_auth",
