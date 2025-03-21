@@ -36,7 +36,9 @@ const Header: FC = () => {
                 <User size={20} />
                 Profile
               </Link>
-              <button onClick={logout}>Log out</button>
+              <button className="logout-button" onClick={logout}>
+                Log out
+              </button>
             </>
           )}
         </nav>
