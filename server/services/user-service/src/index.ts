@@ -10,12 +10,10 @@ import { configUserFile } from "../config/config";
 
 async function startServer() {
   try {
-    // Initialize database connection
     await AppDataSource.initialize().then(() =>
       console.log("✅ Users Database connected")
     );
 
-    // Initialize RabbitMQ and start consuming messages
     await rabbitMQService.startConsuming(async (userData) => {
       await userHandlerService.handleUserCreated(userData);
     });
@@ -43,7 +41,6 @@ async function startServer() {
   }
 }
 
-// Handle graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("🛑 Received SIGTERM signal. Closing connections...");
   await rabbitMQService.closeConnection();

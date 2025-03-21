@@ -14,10 +14,23 @@ export class RabbitMQService {
   private channel: any = null;
   private initialized = false;
 
+  private async connectWithRetry(retries = 5, interval = 5000): Promise<void> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        this.connection = await amqp.connect(rabbitmqConfig.url);
+        this.channel = await this.connection.createChannel();
+        return;
+      } catch (error) {
+        console.log(`Failed to connect to RabbitMQ (attempt ${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, interval));
+      }
+    }
+    throw new Error('Failed to connect to RabbitMQ after multiple retries');
+  }
+
   async initialize() {
     try {
-      this.connection = await amqp.connect(rabbitmqConfig.url);
-      this.channel = await this.connection.createChannel();
+      await this.connectWithRetry();
 
       await this.channel.assertExchange(
         rabbitmqConfig.exchanges.user,
