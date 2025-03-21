@@ -27,7 +27,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await getUser();
       if (response.ok) {
-        const userData = await response.json();
+        const userData = await response.json();        
         setUser(userData);
       } else {
         setUser(null);
@@ -52,7 +52,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchUser();
-  }, [user]);
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, loading, fetchUser, logout }}>

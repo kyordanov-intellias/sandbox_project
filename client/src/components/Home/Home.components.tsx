@@ -1,6 +1,7 @@
 import { BookOpen, MessageSquare, Target, Users } from "lucide-react";
 import { FC } from "react";
 import { Link } from "react-router-dom";
+import "./Home.styles.css";
 
 const Home: FC = () => {
   return (
