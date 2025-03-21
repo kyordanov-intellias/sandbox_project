@@ -17,21 +17,25 @@ const Header: FC = () => {
             <Users size={20} />
             Posts
           </Link>
-          <Link to="/messenger" className="nav-link">
-            <MessageSquare size={20} />
-            Messenger
-          </Link>
-          <Link to="/profile" className="nav-link">
-            <User size={20} />
-            Profile
-          </Link>
-
           {!user ? (
-            <Link to="/register" className="join-button">
-              Join Now
-            </Link>
+            <>
+
+              <Link to="/register" className="join-button">
+                Join Now
+              </Link>
+            </>
           ) : (
-            <button onClick={logout}>Log out</button>
+            <>
+              <Link to="/messenger" className="nav-link">
+                <MessageSquare size={20} />
+                Messenger
+              </Link>
+              <Link to="/profile" className="nav-link">
+                <User size={20} />
+                Profile
+              </Link>
+              <button onClick={logout}>Log out</button>
+            </>
           )}
         </nav>
       </div>

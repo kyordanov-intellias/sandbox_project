@@ -21,8 +21,6 @@ class UserRepository {
   async create(
     email: string,
     password: string,
-    firstName: string,
-    lastName: string,
     userRole: string
   ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -30,8 +28,6 @@ class UserRepository {
     const user = this.repository.create({
       email,
       password: hashedPassword,
-      firstName,
-      lastName,
       userRole,
     });
 
