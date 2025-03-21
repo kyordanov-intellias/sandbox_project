@@ -46,6 +46,7 @@ export class AuthController {
 
     try {
       const existingUser = await userRepository.findByEmail(email);
+
       if (existingUser) {
         ctx.status = 400;
         ctx.body = { error: "User already exists" };
@@ -55,17 +56,15 @@ export class AuthController {
       const newUser = await userRepository.create(
         email,
         password,
-        firstName,
-        lastName,
         userRole
       );
 
       await rabbitMQService.publishUserCreated({
         id: newUser.id.toString(),
         email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
         userRole: newUser.userRole,
+        firstName,
+        lastName,
       });
 
       const { password: _, ...userWithoutPassword } = newUser;

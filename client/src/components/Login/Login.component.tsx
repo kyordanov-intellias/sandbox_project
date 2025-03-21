@@ -4,6 +4,15 @@ import { loginUser } from "../../services/userServices";
 import { useUser } from "../../context/UserContext";
 import { z } from "zod";
 
+interface ApiError {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+  message: string;
+}
+
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
@@ -23,11 +32,13 @@ const Login: FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
     try {
       loginSchema.parse(formData);
       const response = await loginUser(formData);
@@ -37,9 +48,12 @@ const Login: FC = () => {
         fetchUser();
         navigate("/");
       } else {
-        setErrors(data.error || "Login failed!");
+        setErrors({
+          server: data.error || "Login failed!"
+        });
       }
     } catch (error) {
+      console.log(error);
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
@@ -48,6 +62,21 @@ const Login: FC = () => {
           }
         });
         setErrors(newErrors);
+      } else if (error instanceof Error) {
+        const serverError = error as ApiError;
+        if (serverError.response?.data?.error) {
+          setErrors({
+            server: serverError.response.data.error
+          });
+        } else {
+          setErrors({
+            server: serverError.message || 'An error occurred during login'
+          });
+        }
+      } else {
+        setErrors({
+          server: "An unexpected error occurred"
+        });
       }
     }
   };
@@ -61,7 +90,7 @@ const Login: FC = () => {
           <button
             type="button"
             className="auth-toggle-button active"
-            onClick={() => {}}
+            onClick={() => { }}
           >
             Sign In
           </button>
@@ -105,7 +134,14 @@ const Login: FC = () => {
         <button type="submit" className="auth-submit">
           Login
         </button>
+
+        {errors.server && (
+          <div className="error-message">
+            {errors.server}
+          </div>
+        )}
       </form>
+
     </div>
   );
 };

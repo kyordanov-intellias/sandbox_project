@@ -31,7 +31,6 @@ export class RabbitMQService {
   async initialize() {
     try {
       await this.connectWithRetry();
-
       await this.channel.assertExchange(
         rabbitmqConfig.exchanges.user,
         "direct",
