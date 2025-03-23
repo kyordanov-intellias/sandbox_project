@@ -1,25 +1,26 @@
 import {
-  RegisterUserInterface,
   LoginUserInterface,
   UpdateUserInterface,
+  RegisterForm,
 } from "../interfaces/userInterfaces";
 
-export const registerUser = async (formData: RegisterUserInterface) => {
-  const response = await fetch("http://localhost:4000/auth/register", {
-    method: "POST",
+export const registerUser = async (formData: RegisterForm) => {
+  const { confirmPassword, ...registrationData } = formData;
+  console.log(confirmPassword);
+  const response = await fetch('http://localhost:4000/auth/register', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password,
-      userRole: formData.userRole,
-    }),
+    body: JSON.stringify(registrationData),
   });
 
-  return response;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Registration failed');
+  }
+
+  return response.json();
 };
 
 export const loginUser = async (formData: LoginUserInterface) => {
