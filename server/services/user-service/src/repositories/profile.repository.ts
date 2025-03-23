@@ -1,5 +1,6 @@
 import { AppDataSource } from "../db/data-source";
 import { Profile } from "../models/Profile";
+import { FindOneOptions } from "typeorm";
 
 class ProfileRepository {
   private repository = AppDataSource.getRepository(Profile);
@@ -15,10 +16,14 @@ class ProfileRepository {
     return await this.repository.save(profile);
   }
 
-  async findByAuthId(authId: string): Promise<Profile | null> {
-    return await this.repository.findOne({
-      where: { auth_id: authId }
-    });
+  async findByAuthId(authId: string, options?: FindOneOptions<Profile>) {
+    return this.repository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.skills', 'profileSkills')
+      .leftJoinAndSelect('profileSkills.skill', 'skill')
+      .leftJoinAndSelect('profile.contacts', 'contacts')
+      .where('profile.auth_id = :authId', { authId })
+      .getOne();
   }
 
   async findByEmail(email: string): Promise<Profile | null> {

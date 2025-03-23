@@ -2,6 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn
 } from "typeorm";
 
 @Entity("users")
@@ -17,4 +18,7 @@ export class User {
 
   @Column({ nullable: true, name: "user_role" })
   userRole!: string;
+
+  @CreateDateColumn({ name: "created_at" })
+  createdAt!: Date;
 }

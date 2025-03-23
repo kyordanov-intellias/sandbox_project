@@ -11,6 +11,15 @@ interface RegisterRequest {
   firstName: string;
   lastName: string;
   userRole: string;
+  skills: Array<{
+    name: string;
+    proficiencyLevel: string;
+  }>;
+  contacts: Array<{
+    type: string;
+    value: string;
+    isPrimary: boolean;
+  }>;
 }
 
 interface LoginRequest {
@@ -20,10 +29,15 @@ interface LoginRequest {
 
 export class AuthController {
   async register(ctx: Context) {
-    const { firstName, lastName, email, password, userRole } = ctx.request
-      .body as RegisterRequest;
-
-    //remove as (typeguard)
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      password, 
+      userRole,
+      skills,
+      contacts 
+    } = ctx.request.body as RegisterRequest;
 
     const requiredFields = [
       "firstName",
@@ -65,6 +79,8 @@ export class AuthController {
         userRole: newUser.userRole,
         firstName,
         lastName,
+        skills,
+        contacts
       });
 
       const { password: _, ...userWithoutPassword } = newUser;
