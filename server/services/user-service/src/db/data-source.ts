@@ -1,5 +1,8 @@
 import { DataSource } from "typeorm";
 import { Profile } from "../models/Profile";
+import { Skill } from "../models/Skill";
+import { ProfileSkill } from "../models/Skill";
+import { Contact } from "../models/Contact";
 import { configUserFile } from "../../config/config";
 
 export const AppDataSource = new DataSource({
@@ -11,5 +14,7 @@ export const AppDataSource = new DataSource({
   database: configUserFile.database.database,
   synchronize: true,
   logging: false,
-  entities: [Profile],
+  entities: [Profile, Skill, ProfileSkill, Contact],
+  subscribers: [],
+  migrations: [],
 });

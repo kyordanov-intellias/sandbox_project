@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ProfileSkill } from './Skill';
+import { Contact } from './Contact';
 
 @Entity('profiles')
 export class Profile {
@@ -19,4 +21,10 @@ export class Profile {
 
   @Column()
   role!: string;
+
+  @OneToMany(() => ProfileSkill, profileSkill => profileSkill.profile)
+  skills!: ProfileSkill[];
+
+  @OneToMany(() => Contact, contact => contact.profile)
+  contacts!: Contact[];
 }
