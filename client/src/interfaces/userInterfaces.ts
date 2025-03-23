@@ -26,3 +26,13 @@ export interface UserInterface {
   email: string;
   role: string;
 }
+
+export interface User {
+  id: string;         
+  email: string;
+  userRole: string;
+  profile?: { 
+    first_name: string;
+    last_name: string;
+  }
+}

@@ -159,7 +159,6 @@ export class AuthController {
   }
 
   async getUserByToken(ctx: Context) {
-    console.log(`GET USER BY TOKEN`);
 
     try {
       const token = ctx.cookies.get("authToken");

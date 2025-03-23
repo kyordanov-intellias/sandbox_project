@@ -188,10 +188,10 @@ const Register: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="role">Role</label>
+          <label htmlFor="userRole">Role</label>
           <select
-            id="role"
-            name="role"
+            id="userRole"
+            name="userRole"
             value={formData.userRole}
             onChange={handleChange}
           >

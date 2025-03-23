@@ -38,7 +38,6 @@ body {
     var(--color-primary)
   );
   padding: 2rem;
-  margin-top: 4rem;
 }
 
 .auth-form {

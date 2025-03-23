@@ -1,28 +1,8 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getUserById } from "../../services/userServices";
-import { UserInterface } from "../../interfaces/userInterfaces";
 import "./Profile.styles.css";
+import { useUser } from "../../context/UserContext";
 
 export const Profile = () => {
-  const { profileId } = useParams();
-  const [user, setUser] = useState<UserInterface | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!profileId) return;
-    const fetchUser = async () => {
-      const response = await getUserById(profileId!);
-      const user = await response.json();
-      setUser(user);
-      setIsLoading(false);
-    };
-    fetchUser();
-  }, [profileId]);
-
-  if (isLoading) {
-    return <div className="profile-loading">Loading...</div>;
-  }
+  const { user } = useUser();
 
   return (
     <div className="profile-container">
@@ -42,8 +22,8 @@ export const Profile = () => {
             />
           </div>
           <div className="profile-info">
-            <h1>{`${user?.first_name} ${user?.last_name}`}</h1>
-            <span className="profile-role">{user?.role}</span>
+            <h1>{`${user?.profile?.first_name} ${user?.profile?.last_name}`}</h1>
+            <span className="profile-role">{user?.userRole}</span>
           </div>
         </div>
 
@@ -56,7 +36,7 @@ export const Profile = () => {
             </div>
             <div className="detail-item">
               <strong>Role:</strong>
-              <span>{user?.role}</span>
+              <span>{user?.userRole}</span>
             </div>
             <div className="detail-item">
               <strong>Member since:</strong>

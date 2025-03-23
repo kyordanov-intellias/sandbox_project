@@ -1,12 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { getUser, logoutUser } from "../services/userServices";
-
-interface User {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+import { getUser, logoutUser, getUserById } from "../services/userServices";
+import { User } from "../interfaces/userInterfaces";
 
 interface UserContextType {
   user: User | null;
@@ -25,10 +19,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUser = async () => {
     try {
-      const response = await getUser();
-      if (response.ok) {
-        const userData = await response.json();        
-        setUser(userData);
+      const authResponse = await getUser();
+      if (authResponse.ok) {
+        const authData = await authResponse.json();
+        
+        const profileResponse = await getUserById(authData.id);
+        const profileData = await profileResponse.json();
+
+        setUser({
+          ...authData,
+          profile: profileData
+        });
       } else {
         setUser(null);
       }
