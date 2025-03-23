@@ -1,7 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/userServices";
+import { Plus, X } from "lucide-react";
 import { z } from "zod";
+import type { RegisterForm, Skill, Contact } from "../../interfaces/userInterfaces";
+
+const skillSchema = z.object({
+  name: z.string().min(1, "Skill name is required"),
+  proficiencyLevel: z.enum(["beginner", "intermediate", "expert"])
+});
+
+const contactSchema = z.object({
+  type: z.enum(["phone", "linkedin", "github", "other"]),
+  value: z.string().min(1, "Contact value is required"),
+  isPrimary: z.boolean()
+});
 
 const registerSchema = z
   .object({
@@ -11,13 +24,13 @@ const registerSchema = z
     firstName: z.string().min(2, "First name is required"),
     lastName: z.string().min(2, "Last name is required"),
     userRole: z.enum(["participant", "mentor", "administrator"]),
+    skills: z.array(skillSchema),
+    contacts: z.array(contactSchema)
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
-
-type RegisterForm = z.infer<typeof registerSchema>;
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +41,8 @@ const Register: React.FC = () => {
     firstName: "",
     lastName: "",
     userRole: "participant",
+    skills: [],
+    contacts: []
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -55,8 +70,55 @@ const Register: React.FC = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  const addSkill = () => {
+    setFormData(prev => ({
+      ...prev,
+      skills: [...prev.skills, { name: "", proficiencyLevel: "beginner" }]
+    }));
+  };
+
+  const removeSkill = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateSkill = (index: number, field: keyof Skill, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.map((skill, i) => 
+        i === index ? { ...skill, [field]: value } : skill
+      )
+    }));
+  };
+
+  const addContact = () => {
+    setFormData(prev => ({
+      ...prev,
+      contacts: [...prev.contacts, { type: "phone", value: "", isPrimary: false }]
+    }));
+  };
+
+  const removeContact = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      contacts: prev.contacts.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateContact = (index: number, field: keyof Contact, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      contacts: prev.contacts.map((contact, i) => 
+        i === index ? { ...contact, [field]: value } : contact
+      )
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(formData);
     try {
       registerSchema.parse(formData);
       const response = await registerUser(formData);
@@ -202,6 +264,73 @@ const Register: React.FC = () => {
           {errors.userRole && (
             <div className="error-message">{errors.userRole}</div>
           )}
+        </div>
+
+        {/* Skills Section */}
+        <div className="form-section">
+          <h3>Skills</h3>
+          {formData.skills.map((skill, index) => (
+            <div key={index} className="skill-item">
+              <input
+                type="text"
+                placeholder="Skill name"
+                value={skill.name}
+                onChange={(e) => updateSkill(index, "name", e.target.value)}
+              />
+              <select
+                value={skill.proficiencyLevel}
+                onChange={(e) => updateSkill(index, "proficiencyLevel", e.target.value)}
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="expert">Expert</option>
+              </select>
+              <button type="button" onClick={() => removeSkill(index)}>
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+          <button type="button" onClick={addSkill} className="add-button">
+            <Plus size={16} /> Add Skill
+          </button>
+        </div>
+
+        {/* Contacts Section */}
+        <div className="form-section">
+          <h3>Contacts</h3>
+          {formData.contacts.map((contact, index) => (
+            <div key={index} className="contact-item">
+              <select
+                value={contact.type}
+                onChange={(e) => updateContact(index, "type", e.target.value)}
+              >
+                <option value="phone">Phone</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="github">GitHub</option>
+                <option value="other">Other</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Contact value"
+                value={contact.value}
+                onChange={(e) => updateContact(index, "value", e.target.value)}
+              />
+              <label>
+                <input
+                  type="checkbox"
+                  checked={contact.isPrimary}
+                  onChange={(e) => updateContact(index, "isPrimary", e.target.checked)}
+                />
+                Primary
+              </label>
+              <button type="button" onClick={() => removeContact(index)}>
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+          <button type="button" onClick={addContact} className="add-button">
+            <Plus size={16} /> Add Contact
+          </button>
         </div>
 
         <button type="submit" className="auth-submit">
