@@ -28,11 +28,52 @@ export interface UserInterface {
 }
 
 export interface User {
-  id: string;         
+  id: string;
   email: string;
   userRole: string;
-  profile?: { 
+  createdAt: Date;
+  profile?: {
+    auth_id?: string;
+    email: string;
     first_name: string;
+    id: string;
     last_name: string;
+    role: string;
+    skills: Skill[];
+    contacts: Contact[];
   }
+}
+
+export interface EditFormData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+}
+
+export interface Skill {
+  id: string;
+  proficiency_level: 'beginner' | 'intermediate' | 'expert';
+  skill: {
+    id: string;
+    name: string;
+  }
+}
+
+export interface Contact {
+  id: string;
+  type: 'phone' | 'linkedin' | 'github' | 'other';
+  value: string;
+  is_primary: boolean;
+}
+
+export interface RegisterForm {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName: string;
+  lastName: string;
+  userRole: 'participant' | 'mentor' | 'administrator';
+  skills: Skill[];
+  contacts: Contact[];
 }
