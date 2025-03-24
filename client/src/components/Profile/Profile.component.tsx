@@ -39,14 +39,20 @@ export const Profile = () => {
                 className="dropdown-trigger"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
-                {isDropdownOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                {isDropdownOpen ? (
+                  <ChevronUp size={24} />
+                ) : (
+                  <ChevronDown size={24} />
+                )}
               </button>
               {isDropdownOpen && (
                 <div className="profile-dropdown">
-                  <button onClick={() => {
-                    setIsEditModalOpen(true);
-                    setIsDropdownOpen(false);
-                  }}>
+                  <button
+                    onClick={() => {
+                      setIsEditModalOpen(true);
+                      setIsDropdownOpen(false);
+                    }}
+                  >
                     <Edit2 size={16} />
                     Edit Profile
                   </button>
@@ -58,7 +64,9 @@ export const Profile = () => {
               )}
             </div>
             <span className="profile-role">
-              {user?.userRole ? user.userRole.charAt(0).toUpperCase() + user.userRole.slice(1) : ''}
+              {user?.userRole
+                ? user.userRole.charAt(0).toUpperCase() + user.userRole.slice(1)
+                : ""}
             </span>
           </div>
         </div>
@@ -76,15 +84,36 @@ export const Profile = () => {
             </div>
             <div className="detail-item">
               <strong>Member since:</strong>
-              <span>{user?.createdAt ? new Date(user?.createdAt).toLocaleDateString() : ''}</span>
+              <span>
+                {user?.createdAt
+                  ? new Date(user?.createdAt).toLocaleDateString()
+                  : ""}
+              </span>
             </div>
             <div className="detail-item">
               <strong>Skills:</strong>
-              <span>{user?.profile?.skills.map(skill => skill.skill.name + ' - ' + skill.proficiency_level).join(', ')}</span>
+              <span>
+                {user?.profile?.skills?.length
+                  ? user.profile.skills
+                      .map(
+                        (skill) =>
+                          `${skill.skill.name} - ${skill.proficiency_level}`
+                      )
+                      .join(", ")
+                  : "No entered skills"}
+              </span>
             </div>
             <div className="detail-item">
               <strong>Contacts:</strong>
-              <span>{user?.profile?.contacts.map(contact => contact.value).join(', ')}</span>
+              <span>
+                {user?.profile?.contacts && user.profile.contacts.length > 0 ? (
+                  user.profile.contacts
+                    .map((contact) => contact.value)
+                    .join(", ")
+                ) : (
+                  <div>No entered contacts</div>
+                )}
+              </span>
             </div>
           </div>
         </div>
@@ -109,9 +138,9 @@ export const Profile = () => {
         onClose={() => setIsEditModalOpen(false)}
         onSubmit={handleEditProfile}
         initialData={{
-          email: user?.email || '',
-          firstName: user?.profile?.first_name || '',
-          lastName: user?.profile?.last_name || '',
+          email: user?.email || "",
+          firstName: user?.profile?.first_name || "",
+          lastName: user?.profile?.last_name || "",
         }}
       />
     </div>

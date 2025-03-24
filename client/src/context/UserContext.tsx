@@ -22,13 +22,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
       const authResponse = await getUser();
       if (authResponse.ok) {
         const authData = await authResponse.json();
-        
+
         const profileResponse = await getUserById(authData.id);
         const profileData = await profileResponse.json();
+        console.log(profileData);
 
         setUser({
           ...authData,
-          profile: profileData
+          profile: profileData,
         });
       } else {
         setUser(null);

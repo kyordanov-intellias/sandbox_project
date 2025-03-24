@@ -1,8 +1,7 @@
-import { FC, useState } from 'react';
-import { X, Save } from 'lucide-react';
-import './EditProfile.styles.css';
-import { EditFormData } from '../../../interfaces/userInterfaces';
-
+import { FC, useState } from "react";
+import { X, Save } from "lucide-react";
+import "./EditProfile.styles.css";
+import { EditFormData } from "../../../interfaces/userInterfaces";
 
 interface EditProfileProps {
   isOpen: boolean;
@@ -15,12 +14,17 @@ interface EditProfileProps {
   };
 }
 
-export const EditProfile: FC<EditProfileProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
+export const EditProfile: FC<EditProfileProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
     email: initialData.email,
     firstName: initialData.firstName,
     lastName: initialData.lastName,
-    password: '',
+    password: "",
   });
 
   if (!isOpen) return null;
@@ -47,7 +51,9 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, onClose, onSubmit, i
               type="email"
               id="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
           </div>
 
@@ -57,7 +63,9 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, onClose, onSubmit, i
               type="text"
               id="firstName"
               value={formData.firstName}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, firstName: e.target.value })
+              }
             />
           </div>
 
@@ -67,7 +75,9 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, onClose, onSubmit, i
               type="text"
               id="lastName"
               value={formData.lastName}
-              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, lastName: e.target.value })
+              }
             />
           </div>
 
@@ -77,7 +87,9 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, onClose, onSubmit, i
               type="password"
               id="password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               placeholder="Leave blank to keep current password"
             />
           </div>
