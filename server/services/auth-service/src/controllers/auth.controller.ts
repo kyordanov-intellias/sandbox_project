@@ -11,6 +11,15 @@ interface RegisterRequest {
   firstName: string;
   lastName: string;
   userRole: string;
+  skills: Array<{
+    name: string;
+    proficiencyLevel: string;
+  }>;
+  contacts: Array<{
+    type: string;
+    value: string;
+    isPrimary: boolean;
+  }>;
 }
 
 interface LoginRequest {
@@ -20,10 +29,8 @@ interface LoginRequest {
 
 export class AuthController {
   async register(ctx: Context) {
-    const { firstName, lastName, email, password, userRole } = ctx.request
-      .body as RegisterRequest;
-
-    //remove as (typeguard)
+    const { firstName, lastName, email, password, userRole, skills, contacts } =
+      ctx.request.body as RegisterRequest;
 
     const requiredFields = [
       "firstName",
@@ -53,11 +60,7 @@ export class AuthController {
         return;
       }
 
-      const newUser = await userRepository.create(
-        email,
-        password,
-        userRole
-      );
+      const newUser = await userRepository.create(email, password, userRole);
 
       await rabbitMQService.publishUserCreated({
         id: newUser.id.toString(),
@@ -65,6 +68,8 @@ export class AuthController {
         userRole: newUser.userRole,
         firstName,
         lastName,
+        skills,
+        contacts,
       });
 
       const { password: _, ...userWithoutPassword } = newUser;
@@ -159,8 +164,6 @@ export class AuthController {
   }
 
   async getUserByToken(ctx: Context) {
-    console.log(`GET USER BY TOKEN`);
-
     try {
       const token = ctx.cookies.get("authToken");
 

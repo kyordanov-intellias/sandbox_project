@@ -1,11 +1,19 @@
 import Router from "koa-router";
-import { getHealth, createUserProfile } from "../controllers/user.controller";
+import { userController } from "../controllers/user.controller";
+import { Context } from "koa";
 
 const router = new Router({
   prefix: "/users",
 });
 
-router.get("/health", getHealth);
-router.post("/", createUserProfile);
+router.get("/health", (ctx: Context) => {
+  ctx.body = {
+    status: "ok",
+    message: "User service is running",
+  };
+});
+router.get("/:id", userController.getUserById);
+router.put("/:id", userController.updateUserById);
+router.delete("/:id", userController.deleteUserById);
 
 export { router as userRouter };

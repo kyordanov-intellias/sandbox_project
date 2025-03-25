@@ -1,8 +1,12 @@
 import { BookOpen, MessageSquare, Target, Users } from "lucide-react";
 import { FC } from "react";
 import { Link } from "react-router-dom";
+import "./Home.styles.css";
+import { useUser } from "../../context/UserContext";
 
 const Home: FC = () => {
+  const { user } = useUser();
+  
   return (
     <main>
       <section className="hero">
@@ -13,9 +17,15 @@ const Home: FC = () => {
               Connect with mentors, share knowledge, and access educational
               resources in a dynamic, community-driven platform.
             </p>
-            <Link to="/login" className="cta-button">
-              Start Learning
-            </Link>
+            {user ? (
+              <Link to="/posts" className="cta-button">
+                Explore Posts
+              </Link>
+            ) : (
+              <Link to="/login" className="cta-button">
+                Start Learning
+              </Link>
+            )}
           </div>
         </div>
       </section>

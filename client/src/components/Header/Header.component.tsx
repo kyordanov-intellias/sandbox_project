@@ -1,10 +1,13 @@
 import { FC } from "react";
 import { Link } from "react-router-dom";
-import { Home, MessageSquare, Users, User } from "lucide-react";
+import { Home, MessageSquare, Users, User, ShieldUser } from "lucide-react";
 import { useUser } from "../../context/UserContext";
+import "./Header.styles.css";
 
 const Header: FC = () => {
   const { user, logout } = useUser();
+  console.log(user);
+
   return (
     <header className="header">
       <div className="container header-container">
@@ -19,8 +22,7 @@ const Header: FC = () => {
           </Link>
           {!user ? (
             <>
-
-              <Link to="/register" className="join-button">
+              <Link to="/login" className="join-button">
                 Join Now
               </Link>
             </>
@@ -30,11 +32,20 @@ const Header: FC = () => {
                 <MessageSquare size={20} />
                 Messenger
               </Link>
-              <Link to="/profile" className="nav-link">
+              <Link to={`/profile/${user.id}`} className="nav-link">
                 <User size={20} />
                 Profile
               </Link>
-              <button onClick={logout}>Log out</button>
+              {user.userRole === "administrator" && (
+                <Link to={`/admin`} className="nav-link">
+                  <ShieldUser size={20} />
+                  Admin
+                </Link>
+              )}
+
+              <button className="logout-button" onClick={logout}>
+                Log out
+              </button>
             </>
           )}
         </nav>

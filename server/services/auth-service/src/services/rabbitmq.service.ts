@@ -1,12 +1,25 @@
 import amqp from "amqplib";
 import { rabbitmqConfig } from "../../config/rabbitmq";
 
+interface Skill {
+  name: string;
+  proficiencyLevel: string;
+}
+
+interface Contact {
+  type: string;
+  value: string;
+  isPrimary: boolean;
+}
+
 interface UserCreatedEvent {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   userRole: string;
+  skills: Skill[];
+  contacts: Contact[];
 }
 
 export class RabbitMQService {

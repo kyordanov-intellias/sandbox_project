@@ -5,8 +5,8 @@ import "reflect-metadata";
 import { userRouter } from "./routes/user.routes";
 import { AppDataSource } from "./db/data-source";
 import { rabbitMQService } from "./services/rabbitmq.service";
-import { userHandlerService } from "./services/user-handler.service";
 import { configUserFile } from "../config/config";
+import { userHandlerService, UserCreatedEvent } from "./services/user-handler.service";
 
 async function startServer() {
   try {
@@ -14,8 +14,13 @@ async function startServer() {
       console.log("✅ Users Database connected")
     );
 
-    await rabbitMQService.startConsuming(async (userData) => {
-      await userHandlerService.handleUserCreated(userData);
+    await rabbitMQService.startConsuming(async (userData: UserCreatedEvent) => {
+      try {
+        await userHandlerService.handleUserCreated(userData);
+      } catch (error) {
+        console.error('Error processing user creation:', error);
+        throw error;
+      }
     });
 
     const app = new Koa();
