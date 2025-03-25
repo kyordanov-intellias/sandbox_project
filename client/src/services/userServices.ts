@@ -6,6 +6,7 @@ import {
 
 export const registerUser = async (formData: RegisterForm) => {
   const { confirmPassword, ...registrationData } = formData;
+  console.log(confirmPassword);
   const response = await fetch("http://localhost:4000/auth/register", {
     method: "POST",
     headers: {
@@ -19,7 +20,7 @@ export const registerUser = async (formData: RegisterForm) => {
     throw new Error(error.message || "Registration failed");
   }
 
-  return response.json();
+  return response;
 };
 
 export const loginUser = async (formData: LoginUserInterface) => {

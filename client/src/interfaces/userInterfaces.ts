@@ -33,14 +33,26 @@ export interface User {
   userRole: string;
   createdAt: Date;
   profile?: {
-    auth_id?: string;
+    authId?: string;
     email: string;
-    first_name: string;
+    firstName: string;
     id: string;
-    last_name: string;
+    lastName: string;
     role: string;
-    skills: Skill[];
-    contacts: Contact[];
+    skills: Array<{
+      id: string;
+      proficiencyLevel:string;
+      skill:{
+        id: string;
+        name: string;
+      }
+    }>;
+    contacts: Array<{
+      id: string;
+      type: string;
+      value: string;
+      isPrimary: boolean;
+    }>;
   };
 }
 
@@ -51,16 +63,15 @@ export interface EditFormData {
   password: string;
 }
 
-export interface Skill {
-  proficiency_level: "beginner" | "intermediate" | "expert";
+export interface SkillInput {
   name: string;
+  proficiencyLevel: "beginner" | "intermediate" | "expert";
 }
 
-export interface Contact {
-  id: string;
+export interface ContactInput {
   type: "phone" | "linkedin" | "github" | "other";
   value: string;
-  is_primary: boolean;
+  isPrimary: boolean;
 }
 
 export interface RegisterForm {
@@ -70,6 +81,6 @@ export interface RegisterForm {
   firstName: string;
   lastName: string;
   userRole: "participant" | "mentor" | "administrator";
-  skills: Skill[];
-  contacts: Contact[];
+  skills: SkillInput[];
+  contacts: ContactInput[];
 }

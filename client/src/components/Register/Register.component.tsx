@@ -5,8 +5,8 @@ import { Plus, X } from "lucide-react";
 import { z } from "zod";
 import type {
   RegisterForm,
-  Skill,
-  Contact,
+  SkillInput,
+  ContactInput,
 } from "../../interfaces/userInterfaces";
 
 const skillSchema = z.object({
@@ -77,7 +77,7 @@ const Register: React.FC = () => {
   const addSkill = () => {
     setFormData((prev) => ({
       ...prev,
-      skills: [...prev.skills, { name: "", proficiency_level: "beginner" }],
+      skills: [...prev.skills, { name: "", proficiencyLevel: "beginner" }],
     }));
   };
 
@@ -88,7 +88,7 @@ const Register: React.FC = () => {
     }));
   };
 
-  const updateSkill = (index: number, field: keyof Skill, value: string) => {
+  const updateSkill = (index: number, field: keyof SkillInput, value: string) => {
     setFormData((prev) => ({
       ...prev,
       skills: prev.skills.map((skill, i) =>
@@ -102,7 +102,7 @@ const Register: React.FC = () => {
       ...prev,
       contacts: [
         ...prev.contacts,
-        { type: "phone", value: "", is_primary: false } as Contact, // Explicitly cast as Contact
+        { type: "phone", value: "", isPrimary: false },
       ],
     }));
   };
@@ -116,7 +116,7 @@ const Register: React.FC = () => {
 
   const updateContact = (
     index: number,
-    field: keyof Contact,
+    field: keyof ContactInput,
     value: string | boolean
   ) => {
     setFormData((prev) => ({
@@ -130,9 +130,11 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // registerSchema.parse(formData);
+      registerSchema.parse(formData);
       const response = await registerUser(formData);
+      console.log(response);
       const data = await response.json();
+      console.log(data);
 
       if (response.ok) {
         setTimeout(() => {
@@ -288,9 +290,9 @@ const Register: React.FC = () => {
                 onChange={(e) => updateSkill(index, "name", e.target.value)}
               />
               <select
-                value={skill.proficiency_level}
+                value={skill.proficiencyLevel}
                 onChange={(e) =>
-                  updateSkill(index, "proficiency_level", e.target.value)
+                  updateSkill(index, "proficiencyLevel", e.target.value)
                 }
               >
                 <option value="beginner">Beginner</option>
@@ -330,9 +332,9 @@ const Register: React.FC = () => {
               <label>
                 <input
                   type="checkbox"
-                  checked={contact.is_primary}
+                  checked={contact.isPrimary}
                   onChange={(e) =>
-                    updateContact(index, "is_primary", e.target.checked)
+                    updateContact(index, "isPrimary", e.target.checked)
                   }
                 />
                 Primary

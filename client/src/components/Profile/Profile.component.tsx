@@ -34,8 +34,8 @@ export const Profile = () => {
           </div>
           <div className="profile-info">
             <div className="name-section">
-              <h1>{`${user?.profile?.first_name} ${user?.profile?.last_name}`}</h1>
-              <button
+              <h1>{`${user?.profile?.firstName} ${user?.profile?.lastName}`}</h1>
+              <button 
                 className="dropdown-trigger"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
@@ -97,7 +97,7 @@ export const Profile = () => {
                   ? user.profile.skills
                       .map(
                         (skill) =>
-                          `${skill.skill.name} - ${skill.proficiency_level}`
+                          `${skill.skill.name} - ${skill.proficiencyLevel}`
                       )
                       .join(", ")
                   : "No entered skills"}
@@ -139,8 +139,8 @@ export const Profile = () => {
         onSubmit={handleEditProfile}
         initialData={{
           email: user?.email || "",
-          firstName: user?.profile?.first_name || "",
-          lastName: user?.profile?.last_name || "",
+          firstName: user?.profile?.firstName || "",
+          lastName: user?.profile?.lastName || "",
         }}
       />
     </div>
