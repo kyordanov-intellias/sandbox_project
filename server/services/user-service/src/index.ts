@@ -19,7 +19,7 @@ async function startServer() {
         await userHandlerService.handleUserCreated(userData);
       } catch (error) {
         console.error('Error processing user creation:', error);
-        throw error; // This will trigger message requeue
+        throw error;
       }
     });
 

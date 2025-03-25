@@ -7,20 +7,20 @@ export class Profile {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
-  auth_id!: string;
+  @Column({ unique: true, name: 'auth_id' })
+  authId!: string;
 
   @Column()
   email!: string;
 
-  @Column()
-  first_name!: string;
+  @Column({ name: 'first_name' })
+  firstName!: string;
 
-  @Column()
-  last_name!: string;
+  @Column({ name: 'last_name' })
+  lastName!: string;
 
-  @Column()
-  role!: string;
+  @Column({ name: 'role' })
+  userRole!: string;
 
   @OneToMany(() => ProfileSkill, profileSkill => profileSkill.profile)
   skills!: ProfileSkill[];

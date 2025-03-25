@@ -1,13 +1,19 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Profile } from "./Profile";
 
-@Entity('contacts')
+@Entity("contacts")
 export class Contact {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @ManyToOne(() => Profile)
-  @JoinColumn({ name: 'profile_id' })
+  @JoinColumn({ name: "profile_id" })
   profile!: Profile;
 
   @Column()
@@ -16,6 +22,6 @@ export class Contact {
   @Column()
   value!: string;
 
-  @Column({ default: false })
-  is_primary!: boolean;
+  @Column({ name: "is_primary", default: false })
+  isPrimary!: boolean; // matches the frontend & event property naming
 }

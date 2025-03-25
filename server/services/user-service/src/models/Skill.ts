@@ -1,27 +1,40 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Profile } from "./Profile";
+import { ProficiencyLevel } from "../enums/ProficiencyLevel";
 
-@Entity('skills')
+@Entity("skills")
 export class Skill {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column()
   name!: string;
 }
-@Entity('profile_skills')
+
+@Entity("profile_skills")
 export class ProfileSkill {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @ManyToOne(() => Profile)
-  @JoinColumn({ name: 'profile_id' })
+  @JoinColumn({ name: "profile_id" })
   profile!: Profile;
 
   @ManyToOne(() => Skill)
-  @JoinColumn({ name: 'skill_id' })
+  @JoinColumn({ name: "skill_id" })
   skill!: Skill;
 
-  @Column()
-  proficiency_level?: string;
+  @Column({
+    name: "proficiency_level",
+    type: "enum",
+    enum: ProficiencyLevel,
+    default: ProficiencyLevel.BEGINNER,
+  })
+  proficiencyLevel!: ProficiencyLevel;
 }

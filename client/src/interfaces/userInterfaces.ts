@@ -52,12 +52,8 @@ export interface EditFormData {
 }
 
 export interface Skill {
-  id: string;
   proficiency_level: "beginner" | "intermediate" | "expert";
-  skill: {
-    id: string;
-    name: string;
-  };
+  name: string;
 }
 
 export interface Contact {

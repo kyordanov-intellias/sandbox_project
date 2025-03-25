@@ -10,10 +10,7 @@ export const getHealth = async (ctx: Context) => {
 export class UserController {
   async getUserById(ctx: Context) {
     const { id } = ctx.params;
-    const user = await profileRepository.findByAuthId(id, {
-      relations: ['skills', 'contacts']
-    });
-
+    const user = await profileRepository.findByAuthId(id);
     if (!user) {
       ctx.status = 404;
       ctx.body = { message: "User not found" };
@@ -21,7 +18,7 @@ export class UserController {
     }
 
     ctx.body = user;
-  };
+  }
 
   async updateUserById(ctx: Context) {
     ctx.body = { message: "Update user by id endpoint (stub)" };

@@ -1,11 +1,12 @@
-import { AppDataSource } from '../db/data-source';
-import { Profile } from '../models/Profile';
-import { Skill, ProfileSkill } from '../models/Skill';
-import { Contact } from '../models/Contact';
+import { AppDataSource } from "../db/data-source";
+import { Profile } from "../models/Profile";
+import { Skill, ProfileSkill } from "../models/Skill";
+import { Contact } from "../models/Contact";
+import { ProficiencyLevel } from "../enums/ProficiencyLevel";
 
 interface SkillInput {
   name: string;
-  proficiencyLevel: string;
+  proficiencyLevel?: string; // optional to fallback to beginner
 }
 
 interface ContactInput {
@@ -32,7 +33,7 @@ export class UserHandlerService {
 
     try {
       const existingProfile = await queryRunner.manager.findOne(Profile, {
-        where: { auth_id: userData.id }
+        where: { authId: userData.id },
       });
 
       if (existingProfile) {
@@ -41,17 +42,17 @@ export class UserHandlerService {
       }
 
       const profile = new Profile();
-      profile.auth_id = userData.id;
+      profile.authId = userData.id;
       profile.email = userData.email;
-      profile.first_name = userData.firstName;
-      profile.last_name = userData.lastName;
-      profile.role = userData.userRole;
-      
+      profile.firstName = userData.firstName;
+      profile.lastName = userData.lastName;
+      profile.userRole = userData.userRole;
+
       const savedProfile = await queryRunner.manager.save(profile);
 
       for (const skillData of userData.skills) {
         let skill = await queryRunner.manager.findOne(Skill, {
-          where: { name: skillData.name }
+          where: { name: skillData.name },
         });
 
         if (!skill) {
@@ -63,7 +64,14 @@ export class UserHandlerService {
         const profileSkill = new ProfileSkill();
         profileSkill.profile = savedProfile;
         profileSkill.skill = skill;
-        profileSkill.proficiency_level = skillData.proficiencyLevel;
+
+        const level = skillData.proficiencyLevel?.toUpperCase();
+        if (level && Object.keys(ProficiencyLevel).includes(level)) {
+          profileSkill.proficiencyLevel = ProficiencyLevel[level as keyof typeof ProficiencyLevel];
+        } else {
+          profileSkill.proficiencyLevel = ProficiencyLevel.BEGINNER; // fallback if invalid or missing
+        }
+
         await queryRunner.manager.save(profileSkill);
       }
 
@@ -72,17 +80,16 @@ export class UserHandlerService {
         contact.profile = savedProfile;
         contact.type = contactData.type;
         contact.value = contactData.value;
-        contact.is_primary = contactData.isPrimary;
+        contact.isPrimary = contactData.isPrimary;
         await queryRunner.manager.save(contact);
       }
 
       await queryRunner.commitTransaction();
       console.log(`✅ Created profile for auth_id: ${userData.id}`);
       return savedProfile;
-
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('❌ Error handling user created event:', error);
+      console.error("❌ Error handling user created event:", error);
       throw error;
     } finally {
       await queryRunner.release();
@@ -90,4 +97,4 @@ export class UserHandlerService {
   }
 }
 
-export const userHandlerService = new UserHandlerService(); 
+export const userHandlerService = new UserHandlerService();

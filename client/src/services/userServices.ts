@@ -6,18 +6,17 @@ import {
 
 export const registerUser = async (formData: RegisterForm) => {
   const { confirmPassword, ...registrationData } = formData;
-  console.log(confirmPassword);
-  const response = await fetch('http://localhost:4000/auth/register', {
-    method: 'POST',
+  const response = await fetch("http://localhost:4000/auth/register", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(registrationData),
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Registration failed');
+    throw new Error(error.message || "Registration failed");
   }
 
   return response.json();
@@ -64,7 +63,10 @@ export const getUserById = async (id: string) => {
   return response;
 };
 
-export const updateUserById = async (id: string, formData: Partial<UpdateUserInterface>) => {
+export const updateUserById = async (
+  id: string,
+  formData: Partial<UpdateUserInterface>
+) => {
   const response = await fetch(`http://localhost:4000/users/${id}`, {
     method: "PUT",
     credentials: "include",
@@ -85,4 +87,3 @@ export const deleteUserById = async (id: string) => {
 
   return response;
 };
-
