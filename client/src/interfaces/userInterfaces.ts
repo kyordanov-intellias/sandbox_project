@@ -83,4 +83,6 @@ export interface RegisterForm {
   userRole: "participant" | "mentor" | "administrator";
   skills: SkillInput[];
   contacts: ContactInput[];
+  profileImage: string;
+  coverImage: string;
 }
