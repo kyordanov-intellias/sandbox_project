@@ -8,12 +8,14 @@ import { Admin } from "./components/Admin/Admin.component";
 
 function App() {
   return (
+    //TODO Add private routes
     <>
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts" element={<h1>Posts Page</h1>} />
         <Route path="/messenger" element={<h1>Messenger Page</h1>} />
+        {/* TODO add error hadnling if profile dones't exist - like when entered through url*/}
         <Route path="/profile/:profileId" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

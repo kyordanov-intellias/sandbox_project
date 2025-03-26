@@ -257,6 +257,7 @@ export class AuthController {
       }
 
       await userRepository.deleteByEmail(email);
+      //TODO Add rabbitmq message to inform user-service to delete user as well
 
       ctx.status = 200;
       ctx.body = { message: `User with email ${email} has been deleted.` };

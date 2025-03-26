@@ -16,6 +16,9 @@ export const Profile = () => {
     setIsEditModalOpen(false);
   };
 
+  //TODO -> add 3 more sections -> your posts, likes, reposts
+  //TODO -> followers
+
   return (
     <div className="profile-container">
       <div className="profile-cover">

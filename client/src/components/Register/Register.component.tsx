@@ -8,7 +8,7 @@ import type {
   SkillInput,
   ContactInput,
 } from "../../interfaces/userInterfaces";
-import './Register.styles.css';
+import "./Register.styles.css";
 import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
 import { DEFAULT_IMAGES } from "./defaultImages";
 
@@ -56,23 +56,34 @@ const Register: React.FC = () => {
     coverImage: DEFAULT_IMAGES.cover,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { uploading: uploadingProfile, error: profileError, uploadImage: uploadProfileImage } = useCloudinaryUpload();
-  const { uploading: uploadingCover, error: coverError, uploadImage: uploadCoverImage } = useCloudinaryUpload();
+  const {
+    uploading: uploadingProfile,
+    error: profileError,
+    uploadImage: uploadProfileImage,
+  } = useCloudinaryUpload();
+  const {
+    uploading: uploadingCover,
+    error: coverError,
+    uploadImage: uploadCoverImage,
+  } = useCloudinaryUpload();
 
-  const handleImageUpload = (type: 'profile' | 'cover') => async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload =
+    (type: "profile" | "cover") =>
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    const uploadFn = type === 'profile' ? uploadProfileImage : uploadCoverImage;
-    const imageUrl = await uploadFn(file);
+      const uploadFn =
+        type === "profile" ? uploadProfileImage : uploadCoverImage;
+      const imageUrl = await uploadFn(file);
 
-    if (imageUrl) {
-      setFormData(prev => ({
-        ...prev,
-        [type === 'profile' ? 'profileImage' : 'coverImage']: imageUrl
-      }));
-    }
-  };
+      if (imageUrl) {
+        setFormData((prev) => ({
+          ...prev,
+          [type === "profile" ? "profileImage" : "coverImage"]: imageUrl,
+        }));
+      }
+    };
 
   const getPasswordStrength = (
     password: string
@@ -112,7 +123,11 @@ const Register: React.FC = () => {
     }));
   };
 
-  const updateSkill = (index: number, field: keyof SkillInput, value: string) => {
+  const updateSkill = (
+    index: number,
+    field: keyof SkillInput,
+    value: string
+  ) => {
     setFormData((prev) => ({
       ...prev,
       skills: prev.skills.map((skill, i) =>
@@ -163,7 +178,7 @@ const Register: React.FC = () => {
       if (response.ok) {
         setTimeout(() => {
           navigate("/login");
-        }, 2000);
+        }, 1000);
       } else {
         setErrors(data.error || "Registration failed!");
       }
@@ -198,7 +213,7 @@ const Register: React.FC = () => {
           <button
             type="button"
             className="auth-toggle-button active"
-            onClick={() => { }}
+            onClick={() => {}}
           >
             Sign Up
           </button>
@@ -212,7 +227,7 @@ const Register: React.FC = () => {
                 type="file"
                 id="profileImage"
                 accept="image/*"
-                onChange={(e) => handleImageUpload('profile')(e)}
+                onChange={(e) => handleImageUpload("profile")(e)}
                 className="file-input"
               />
               {formData.profileImage && (
@@ -220,8 +235,12 @@ const Register: React.FC = () => {
                   <img src={formData.profileImage} alt="Profile preview" />
                 </div>
               )}
-              {uploadingProfile && <div className="upload-status">Uploading...</div>}
-              {profileError && <div className="error-message">{profileError}</div>}
+              {uploadingProfile && (
+                <div className="upload-status">Uploading...</div>
+              )}
+              {profileError && (
+                <div className="error-message">{profileError}</div>
+              )}
             </div>
           </div>
 
@@ -232,7 +251,7 @@ const Register: React.FC = () => {
                 type="file"
                 id="coverImage"
                 accept="image/*"
-                onChange={(e) => handleImageUpload('cover')(e)}
+                onChange={(e) => handleImageUpload("cover")(e)}
                 className="file-input"
               />
               {formData.coverImage && (
@@ -240,7 +259,9 @@ const Register: React.FC = () => {
                   <img src={formData.coverImage} alt="Cover preview" />
                 </div>
               )}
-              {uploadingCover && <div className="upload-status">Uploading...</div>}
+              {uploadingCover && (
+                <div className="upload-status">Uploading...</div>
+              )}
               {coverError && <div className="error-message">{coverError}</div>}
             </div>
           </div>

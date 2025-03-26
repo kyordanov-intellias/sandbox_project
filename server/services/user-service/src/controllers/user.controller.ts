@@ -21,10 +21,12 @@ export class UserController {
   }
 
   async updateUserById(ctx: Context) {
+    //TODO update users by id
     ctx.body = { message: "Update user by id endpoint (stub)" };
   }
 
   async deleteUserById(ctx: Context) {
+    //TODO delete user by id
     ctx.body = { message: "Delete user by id endpoint (stub)" };
   }
 }
