@@ -18,6 +18,8 @@ interface UserCreatedEvent {
   firstName: string;
   lastName: string;
   userRole: string;
+  profileImage?: string;
+  coverImage?: string;
   skills: Skill[];
   contacts: Contact[];
 }
