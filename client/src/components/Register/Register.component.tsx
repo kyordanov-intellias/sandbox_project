@@ -10,6 +10,7 @@ import type {
 } from "../../interfaces/userInterfaces";
 import './Register.styles.css';
 import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
+import { DEFAULT_IMAGES } from "./defaultImages";
 
 const skillSchema = z.object({
   name: z.string().min(1, "Skill name is required"),
@@ -51,8 +52,8 @@ const Register: React.FC = () => {
     userRole: "participant",
     skills: [],
     contacts: [],
-    profileImage: "",
-    coverImage: "",
+    profileImage: DEFAULT_IMAGES.profile,
+    coverImage: DEFAULT_IMAGES.cover,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { uploading: uploadingProfile, error: profileError, uploadImage: uploadProfileImage } = useCloudinaryUpload();
@@ -153,8 +154,6 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log(formData);
-      return;
       registerSchema.parse(formData);
       const response = await registerUser(formData);
       console.log(response);
