@@ -39,6 +39,8 @@ export interface User {
     id: string;
     lastName: string;
     role: string;
+    profileImage?: string;
+    coverImage?: string;
     skills: Array<{
       id: string;
       proficiencyLevel:string;

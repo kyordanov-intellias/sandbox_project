@@ -4,6 +4,7 @@ import "./Profile.styles.css";
 import { useUser } from "../../context/UserContext";
 import { EditProfile } from "./Edit-Profile/EditProfile.component";
 import { EditFormData } from "../../interfaces/userInterfaces";
+import { DEFAULT_IMAGES } from "../Register/defaultImages";
 
 export const Profile = () => {
   const { user } = useUser();
@@ -19,7 +20,7 @@ export const Profile = () => {
     <div className="profile-container">
       <div className="profile-cover">
         <img
-          src="https://images.supersport.com/media/5n1bzesq/barcelona-1200g.jpg?width=1920&quality=90&format=webp"
+          src={user?.profile?.coverImage || DEFAULT_IMAGES.cover}
           alt="Cover"
         />
       </div>
@@ -28,7 +29,7 @@ export const Profile = () => {
         <div className="profile-header">
           <div className="profile-picture">
             <img
-              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
+              src={user?.profile?.profileImage || DEFAULT_IMAGES.profile}
               alt="Profile"
             />
           </div>
