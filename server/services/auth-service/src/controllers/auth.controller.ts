@@ -11,6 +11,8 @@ interface RegisterRequest {
   firstName: string;
   lastName: string;
   userRole: string;
+  profileImage?: string;
+  coverImage?: string;
   skills: Array<{
     name: string;
     proficiencyLevel: string;
@@ -29,8 +31,17 @@ interface LoginRequest {
 
 export class AuthController {
   async register(ctx: Context) {
-    const { firstName, lastName, email, password, userRole, skills, contacts } =
-      ctx.request.body as RegisterRequest;
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      password, 
+      userRole, 
+      skills, 
+      contacts,
+      profileImage,
+      coverImage 
+    } = ctx.request.body as RegisterRequest;
 
     const requiredFields = [
       "firstName",
@@ -68,6 +79,8 @@ export class AuthController {
         userRole: newUser.userRole,
         firstName,
         lastName,
+        profileImage,
+        coverImage,
         skills,
         contacts,
       });

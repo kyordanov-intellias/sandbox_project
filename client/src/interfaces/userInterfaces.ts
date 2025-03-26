@@ -39,6 +39,8 @@ export interface User {
     id: string;
     lastName: string;
     role: string;
+    profileImage?: string;
+    coverImage?: string;
     skills: Array<{
       id: string;
       proficiencyLevel:string;
@@ -83,4 +85,6 @@ export interface RegisterForm {
   userRole: "participant" | "mentor" | "administrator";
   skills: SkillInput[];
   contacts: ContactInput[];
+  profileImage: string;
+  coverImage: string;
 }

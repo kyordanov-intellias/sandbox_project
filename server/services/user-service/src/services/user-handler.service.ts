@@ -6,7 +6,7 @@ import { ProficiencyLevel } from "../enums/ProficiencyLevel";
 
 interface SkillInput {
   name: string;
-  proficiencyLevel?: string; // optional to fallback to beginner
+  proficiencyLevel?: string;
 }
 
 interface ContactInput {
@@ -23,6 +23,8 @@ export interface UserCreatedEvent {
   userRole: string;
   skills: SkillInput[];
   contacts: ContactInput[];
+  profileImage?: string;
+  coverImage?: string;
 }
 
 export class UserHandlerService {
@@ -47,6 +49,10 @@ export class UserHandlerService {
       profile.firstName = userData.firstName;
       profile.lastName = userData.lastName;
       profile.userRole = userData.userRole;
+      profile.profileImage = userData.profileImage || "";
+      profile.coverImage = userData.coverImage || "";
+
+      console.log('Profile being saved:', profile);
 
       const savedProfile = await queryRunner.manager.save(profile);
 

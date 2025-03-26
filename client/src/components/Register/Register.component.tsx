@@ -8,6 +8,9 @@ import type {
   SkillInput,
   ContactInput,
 } from "../../interfaces/userInterfaces";
+import './Register.styles.css';
+import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
+import { DEFAULT_IMAGES } from "./defaultImages";
 
 const skillSchema = z.object({
   name: z.string().min(1, "Skill name is required"),
@@ -30,6 +33,8 @@ const registerSchema = z
     userRole: z.enum(["participant", "mentor", "administrator"]),
     skills: z.array(skillSchema),
     contacts: z.array(contactSchema),
+    profileImage: z.string().optional(),
+    coverImage: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -47,8 +52,27 @@ const Register: React.FC = () => {
     userRole: "participant",
     skills: [],
     contacts: [],
+    profileImage: DEFAULT_IMAGES.profile,
+    coverImage: DEFAULT_IMAGES.cover,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { uploading: uploadingProfile, error: profileError, uploadImage: uploadProfileImage } = useCloudinaryUpload();
+  const { uploading: uploadingCover, error: coverError, uploadImage: uploadCoverImage } = useCloudinaryUpload();
+
+  const handleImageUpload = (type: 'profile' | 'cover') => async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const uploadFn = type === 'profile' ? uploadProfileImage : uploadCoverImage;
+    const imageUrl = await uploadFn(file);
+
+    if (imageUrl) {
+      setFormData(prev => ({
+        ...prev,
+        [type === 'profile' ? 'profileImage' : 'coverImage']: imageUrl
+      }));
+    }
+  };
 
   const getPasswordStrength = (
     password: string
@@ -174,12 +198,53 @@ const Register: React.FC = () => {
           <button
             type="button"
             className="auth-toggle-button active"
-            onClick={() => {}}
+            onClick={() => { }}
           >
             Sign Up
           </button>
         </div>
 
+        <div className="form-section images-section">
+          <div className="form-group">
+            <label htmlFor="profileImage">Profile Picture</label>
+            <div className="image-upload-container">
+              <input
+                type="file"
+                id="profileImage"
+                accept="image/*"
+                onChange={(e) => handleImageUpload('profile')(e)}
+                className="file-input"
+              />
+              {formData.profileImage && (
+                <div className="image-preview">
+                  <img src={formData.profileImage} alt="Profile preview" />
+                </div>
+              )}
+              {uploadingProfile && <div className="upload-status">Uploading...</div>}
+              {profileError && <div className="error-message">{profileError}</div>}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="coverImage">Cover Image</label>
+            <div className="image-upload-container">
+              <input
+                type="file"
+                id="coverImage"
+                accept="image/*"
+                onChange={(e) => handleImageUpload('cover')(e)}
+                className="file-input"
+              />
+              {formData.coverImage && (
+                <div className="image-preview cover-preview">
+                  <img src={formData.coverImage} alt="Cover preview" />
+                </div>
+              )}
+              {uploadingCover && <div className="upload-status">Uploading...</div>}
+              {coverError && <div className="error-message">{coverError}</div>}
+            </div>
+          </div>
+        </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
