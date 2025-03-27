@@ -6,7 +6,6 @@ import "./Header.styles.css";
 
 const Header: FC = () => {
   const { user, logout } = useUser();
-  console.log(user);
 
   return (
     <header className="header">

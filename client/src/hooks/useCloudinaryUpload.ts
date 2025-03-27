@@ -11,6 +11,8 @@ export const useCloudinaryUpload = (): UseCloudinaryUploadReturn => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // TODO move to backend
+
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
       setUploading(true);

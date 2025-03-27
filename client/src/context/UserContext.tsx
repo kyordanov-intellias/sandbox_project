@@ -56,6 +56,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchUser();
   }, []);
 
+  //TODO useCallback
+
   return (
     <UserContext.Provider value={{ user, loading, fetchUser, logout }}>
       {children}

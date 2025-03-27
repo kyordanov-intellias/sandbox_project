@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useCloudinaryUpload } from '../../hooks/useCloudinaryUpload';
-import './ImageUploadPreview.styles.css';
+import { useState } from "react";
+import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
+import "./ImageUploadPreview.styles.css";
 
 interface ImageUploadPreviewProps {
   onImageUpload: (url: string) => void;
@@ -11,7 +11,7 @@ interface ImageUploadPreviewProps {
 export const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
   onImageUpload,
   label,
-  className = ''
+  className = "",
 }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const { uploading, error, uploadImage } = useCloudinaryUpload();
@@ -24,6 +24,7 @@ export const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
+      // TODO typegard
     };
     reader.readAsDataURL(file);
 
@@ -49,21 +50,13 @@ export const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
 
       {preview && (
         <div className="preview-container">
-          <img
-            src={preview}
-            alt="Preview"
-            className="preview-image"
-          />
+          <img src={preview} alt="Preview" className="preview-image" />
         </div>
       )}
 
-      {uploading && (
-        <div className="upload-status">Uploading...</div>
-      )}
+      {uploading && <div className="upload-status">Uploading...</div>}
 
-      {error && (
-        <div className="error-message">{error}</div>
-      )}
+      {error && <div className="error-message">{error}</div>}
     </div>
   );
 };
