@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -7,10 +7,10 @@ interface PrivateRouteProps {
   redirectPath?: string;
 }
 
-export function PrivateRoute({ 
-  children, 
+export function PrivateRoute({
+  children,
   requireAdmin = false,
-  redirectPath = "/login"
+  redirectPath = "/login",
 }: PrivateRouteProps) {
   const { user, loading } = useUser();
 
@@ -22,7 +22,7 @@ export function PrivateRoute({
     return <Navigate to={redirectPath} replace />;
   }
 
-  if (requireAdmin && user.profile?.role !== "administrator") {
+  if (requireAdmin && user.userRole !== "administrator") {
     return <Navigate to="/" replace />;
   }
 

@@ -7,8 +7,8 @@ import { Profile } from "./components/Profile/Profile.component";
 import { Admin } from "./components/Admin/Admin.component";
 import { Posts } from "./components/Posts/Posts.components";
 import { CreatePost } from "./components/CreatePost/CreatePost.component";
-import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute.component";
-import { AuthRoute } from "./components/AuthRoute/AuthRoute.component";
+import { PrivateRoute } from "./components/Route-Guards/PrivateRoute/PrivateRoute.component";
+import { AuthRoute } from "./components/Route-Guards/AuthRoute/AuthRoute.component";
 
 function App() {
   return (
@@ -17,53 +17,54 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts" element={<Posts />} />
-        <Route 
-          path="/messenger" 
+        <Route
+          path="/messenger"
           element={
             <PrivateRoute>
               <h1>Messenger Page</h1>
             </PrivateRoute>
-          } 
+          }
         />
-        <Route 
-          path="/profile/:profileId" 
+        <Route
+          path="/profile/:profileId"
+          // TODO -> in future you can search other users
           element={
             <PrivateRoute>
               <Profile />
             </PrivateRoute>
-          } 
+          }
         />
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             <AuthRoute>
               <Login />
             </AuthRoute>
-          } 
+          }
         />
-        <Route 
-          path="/register" 
+        <Route
+          path="/register"
           element={
             <AuthRoute>
               <Register />
             </AuthRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <PrivateRoute requireAdmin>
               <Admin />
             </PrivateRoute>
-          } 
+          }
         />
-        <Route 
-          path="/create-post" 
+        <Route
+          path="/create-post"
           element={
             <PrivateRoute>
               <CreatePost />
             </PrivateRoute>
-          } 
+          }
         />
       </Routes>
     </>
