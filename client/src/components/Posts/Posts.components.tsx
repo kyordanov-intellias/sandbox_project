@@ -48,10 +48,18 @@ export function Posts() {
   ];
 
   return (
-    <div>
-      {mockPosts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
-    </div>
+    <div style={{
+      width: "70%",
+      margin: "0px auto",
+      display: "flex",
+      flexDirection: "column",
+      gap: "3rem"
+    }}>
+{
+  mockPosts.map((post) => (
+    <PostCard key={post.id} post={post} />
+  ))
+}
+    </div >
   );
 }
