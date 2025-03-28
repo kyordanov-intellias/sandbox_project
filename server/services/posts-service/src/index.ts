@@ -1,10 +1,10 @@
+import "reflect-metadata";
 import Koa from "koa";
 import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
-import { configPostsFile } from "../config/config";
-import { postsRouter } from "./routes/posts.routes";
 import { AppDataSource } from "./db/data-source";
-import koaCookie from "koa-cookie";
+import { postsRouter } from "./routes/posts.routes";
+import { configPostsFile } from "../config/config";
 
 async function startServer() {
   try {
@@ -20,9 +20,7 @@ async function startServer() {
         credentials: true,
       })
     );
-
     app.use(bodyParser());
-    app.use(koaCookie());
     app.use(postsRouter.routes());
     app.use(postsRouter.allowedMethods());
 
@@ -35,5 +33,11 @@ async function startServer() {
     process.exit(1);
   }
 }
+
+process.on("SIGTERM", async () => {
+  console.log("🛑 Received SIGTERM signal. Closing connections...");
+  await AppDataSource.destroy();
+  process.exit(0);
+});
 
 startServer();
