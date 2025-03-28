@@ -4,12 +4,13 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToMany
+    ManyToOne,
+    JoinColumn
   } from "typeorm";
-  import { Comment } from "./Comment.entity";
+  import { Post } from "./Post.entity";
   
-  @Entity("posts")
-  export class Post {
+  @Entity("comments")
+  export class Comment {
     @PrimaryGeneratedColumn("uuid")
     id!: string;
   
@@ -19,17 +20,12 @@ import {
     @Column("text")
     content!: string;
   
-    @Column({ nullable: true })
-    imageUrl?: string;
+    @Column("uuid")
+    postId!: string;
   
-    @Column({ name: "likes_count", default: 0 })
-    likesCount!: number;
-  
-    @Column({ name: "reposts_count", default: 0 })
-    repostsCount!: number;
-  
-    @OneToMany(() => Comment, comment => comment.post)
-    comments!: Comment[];
+    @ManyToOne(() => Post, post => post.comments, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "post_id" })
+    post!: Post;
   
     @CreateDateColumn({ name: "created_at" })
     createdAt!: Date;
