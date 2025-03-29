@@ -13,12 +13,15 @@ interface UpdateCommentRequest {
 }
 
 interface CommentContext extends ParameterizedContext {
-  request: Context["request"] & { body: CreateCommentRequest | UpdateCommentRequest };
+  request: Context["request"] & {
+    body: CreateCommentRequest | UpdateCommentRequest;
+  };
 }
 
 class CommentsController {
   async createComment(ctx: CommentContext) {
-    const { content, authorId, postId } = ctx.request.body as CreateCommentRequest;
+    const { content, authorId, postId } = ctx.request
+      .body as CreateCommentRequest; //TODO typeguard
 
     if (!content || !authorId || !postId) {
       ctx.status = 400;
@@ -44,7 +47,10 @@ class CommentsController {
       ctx.body = comment;
     } catch (error) {
       ctx.status = 500;
-      ctx.body = { error: "Error creating comment" , details: (error as Error).message };
+      ctx.body = {
+        error: "Error creating comment",
+        details: (error as Error).message,
+      };
     }
   }
 
@@ -55,13 +61,16 @@ class CommentsController {
       ctx.body = comments;
     } catch (error) {
       ctx.status = 500;
-      ctx.body = { error: "Error fetching comments" };
+      ctx.body = {
+        error: "Error fetching comments",
+        details: (error as Error).message,
+      };
     }
   }
 
   async updateComment(ctx: CommentContext) {
     const { id } = ctx.params;
-    const { content } = ctx.request.body as UpdateCommentRequest;
+    const { content } = ctx.request.body as UpdateCommentRequest; //TODO typeguard
 
     if (!content) {
       ctx.status = 400;

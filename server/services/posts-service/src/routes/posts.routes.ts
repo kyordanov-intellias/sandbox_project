@@ -5,7 +5,6 @@ import { Context } from "koa";
 
 const router = new Router({ prefix: "/posts" });
 
-
 router.get("/health", async (ctx: Context) => {
   ctx.body = {
     status: "ok",
@@ -17,7 +16,8 @@ router.post("/", postsController.createPost);
 router.get("/", postsController.getAllPosts);
 router.get("/:id", postsController.getPost);
 router.post("/:id/like", postsController.likePost);
-
+router.post("/:id/dislike", postsController.dislikePost);
+//TODO make repost fn -> like the likes
 router.get("/:postId/comments", commentsController.getPostComments);
 router.post("/:postId/comments", commentsController.createComment);
 router.put("/comments/:id", commentsController.updateComment);
