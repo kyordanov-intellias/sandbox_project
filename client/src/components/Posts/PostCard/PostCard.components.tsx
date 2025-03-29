@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Heart, MessageCircle, Repeat2 } from "lucide-react";
-import type { Post } from "../types";
+import { Post } from "../../../interfaces/postsInterfaces";
 import { PostModal } from "../PostModal/PostModal.component";
 import { UserHoverCard } from "../UserHoverCard/UserHoverCard.component";
 import "./PostCard.styles.css";
@@ -19,14 +19,14 @@ export function PostCard({ post }: PostCardProps) {
         {/* Author Info */}
         <div className="post-card-author">
           <img
-            src={post.author.avatar}
-            alt={post.author.name}
+            src={post.authorId}
+            alt={post.authorId}
             className="post-card-avatar"
           />
           <div className="group relative">
-            <div className="post-card-author-name">{post.author.name}</div>
+            <div className="post-card-author-name">{post.authorId}</div>
             <div className="hidden group-hover:block">
-              <UserHoverCard user={post.author} />
+              <UserHoverCard user={post.authorId} />
             </div>
           </div>
         </div>
@@ -35,9 +35,9 @@ export function PostCard({ post }: PostCardProps) {
         <p className="post-card-content">{post.content}</p>
 
         {/* Post Image */}
-        {post.image && (
+        {post.imageUrl && (
           <img
-            src={post.image}
+            src={post.imageUrl}
             alt="Post content"
             className="post-card-image"
           />
@@ -56,7 +56,7 @@ export function PostCard({ post }: PostCardProps) {
               size={20}
               className={isLiked ? "fill-red-500 text-red-500" : ""}
             />
-            <span>{post.likes}</span>
+            <span>{post.likesCount}</span>
           </button>
 
           <button className="post-card-action-button comment-button">
@@ -66,7 +66,7 @@ export function PostCard({ post }: PostCardProps) {
 
           <button className="post-card-action-button repost-button">
             <Repeat2 size={20} />
-            <span>{post.reposts}</span>
+            <span>{post.repostsCount}</span>
           </button>
         </div>
       </div>
