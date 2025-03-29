@@ -21,14 +21,13 @@ class PostRepository {
       .getOne();
   }
 
-
   async getAllPosts() {
     return this.repository
       .createQueryBuilder("post")
       .leftJoinAndSelect("post.comments", "comments")
       .orderBy("post.created_at", "DESC")
       .getMany();
-  } 
+  }
 
   async incrementLikes(id: string): Promise<Post | null> {
     await this.repository
@@ -38,6 +37,17 @@ class PostRepository {
       .where("id = :id", { id })
       .execute();
 
+    return this.findById(id);
+  }
+
+  async decrementLikes(id: string): Promise<Post | null> {
+    await this.repository
+      .createQueryBuilder()
+      .update(Post)
+      .set({ likesCount: () => "GREATEST(likes_count - 1, 0)" })
+      .where("id = :id", { id })
+      .execute();
+  
     return this.findById(id);
   }
 
