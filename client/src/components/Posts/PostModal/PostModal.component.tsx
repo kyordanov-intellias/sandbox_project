@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import type { Post } from '../types';
+import { Post} from '../../../interfaces/postsInterfaces';
 import { UserHoverCard } from '../UserHoverCard/UserHoverCard.component';
 import './PostModal.styles.css';
 
@@ -17,10 +17,10 @@ export function PostModal({ post, onClose }: PostModalProps) {
       />
       <div className="modal-container">
         {/* Image Section */}
-        {post.image && (
+        {post.imageUrl && (
           <div className="modal-image-container">
             <img
-              src={post.image}
+              src={post.imageUrl}
               alt="Post content"
               className="modal-image"
             />
@@ -28,7 +28,7 @@ export function PostModal({ post, onClose }: PostModalProps) {
         )}
 
         {/* Content Section */}
-        <div className={`modal-content ${!post.image ? 'w-full' : ''}`}>
+        <div className={`modal-content ${!post.authorId ? 'w-full' : ''}`}>
           <button
             onClick={onClose}
             className="modal-close-button"
@@ -39,16 +39,16 @@ export function PostModal({ post, onClose }: PostModalProps) {
           {/* Author Info */}
           <div className="modal-author">
             <img
-              src={post.author.avatar}
-              alt={post.author.name}
+              src={post.authorId}
+              alt={post.authorId}
               className="modal-author-avatar"
             />
             <div className="group relative">
               <div className="modal-author-name">
-                {post.author.name}
+                {post.authorId}
               </div>
               <div className="hidden group-hover:block">
-                <UserHoverCard user={post.author} />
+                <UserHoverCard user={post.authorId} />
               </div>
             </div>
           </div>
@@ -62,17 +62,17 @@ export function PostModal({ post, onClose }: PostModalProps) {
             {post.comments.map((comment) => (
               <div key={comment.id} className="comment-container">
                 <img
-                  src={comment.user.avatar}
-                  alt={comment.user.name}
+                  src={comment.authorId}
+                  alt={comment.authorId}
                   className="comment-avatar"
                 />
                 <div>
                   <div className="group relative inline-block">
                     <span className="comment-author-name">
-                      {comment.user.name}
+                      {comment.authorId}
                     </span>
                     <div className="hidden group-hover:block">
-                      <UserHoverCard user={comment.user} />
+                      <UserHoverCard user={comment.authorId} />
                     </div>
                   </div>
                   <p className="comment-content">{comment.content}</p>

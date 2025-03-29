@@ -5,7 +5,7 @@ interface AuthRouteProps {
   children: React.ReactNode;
 }
 
-export function AuthRoute({ children }: AuthRouteProps) {
+export default function AuthRoute({ children }: AuthRouteProps) {
   const { user, loading } = useUser();
 
   if (loading) {
