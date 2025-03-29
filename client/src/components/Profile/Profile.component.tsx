@@ -15,7 +15,7 @@ import { EditProfile } from "./Edit-Profile/EditProfile.component";
 import { EditFormData } from "../../interfaces/userInterfaces";
 import { DEFAULT_IMAGES } from "../Register/defaultImages";
 
-export const Profile = () => {
+export default function Profile() {
   const { user } = useUser();
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -221,4 +221,4 @@ export const Profile = () => {
       />
     </div>
   );
-};
+}

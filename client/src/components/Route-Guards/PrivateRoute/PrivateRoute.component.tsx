@@ -7,7 +7,7 @@ interface PrivateRouteProps {
   redirectPath?: string;
 }
 
-export function PrivateRoute({
+export default function PrivateRoute({
   children,
   requireAdmin = false,
   redirectPath = "/login",
