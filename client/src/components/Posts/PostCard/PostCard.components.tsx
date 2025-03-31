@@ -1,40 +1,69 @@
 import { useState } from "react";
 import { Heart, MessageCircle, Repeat2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Post } from "../../../interfaces/postsInterfaces";
 import { PostModal } from "../PostModal/PostModal.component";
-import { UserHoverCard } from "../UserHoverCard/UserHoverCard.component";
+import { useUser } from "../../../context/UserContext";
 import "./PostCard.styles.css";
 
 interface PostCardProps {
   post: Post;
+  onPostUpdate: (updatedPost: Post) => void;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, onPostUpdate }: PostCardProps) {
+  const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user || isLiking) return;
+
+    try {
+      setIsLiking(true);
+      const action = post.isLikedByUser ? 'dislike' : 'like';
+      const response = await fetch(
+        `http://localhost:4000/posts/${post.id}/${action}?userId=${user.id}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update like status');
+      }
+
+      const updatedPost = await response.json();
+      onPostUpdate(updatedPost);
+    } catch (error) {
+      console.error('Error updating like:', error);
+    } finally {
+      setIsLiking(false);
+    }
+  };
 
   return (
     <>
       <div className="post-card" onClick={() => setIsModalOpen(true)}>
-        {/* Author Info */}
         <div className="post-card-author">
           <img
-            src={post.authorId}
-            alt={post.authorId}
+            src={post.authorInfo.profileImage}
+            alt={`${post.authorInfo.firstName}'s avatar`}
             className="post-card-avatar"
           />
-          <div className="group relative">
-            <div className="post-card-author-name">{post.authorId}</div>
-            <div className="hidden group-hover:block">
-              <UserHoverCard user={post.authorId} />
-            </div>
-          </div>
+          <Link 
+            to={`/profile/${post.authorId}`}
+            className="post-card-author-name"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {post.authorInfo.firstName} {post.authorInfo.lastName}
+          </Link>
         </div>
 
-        {/* Post Content */}
         <p className="post-card-content">{post.content}</p>
 
-        {/* Post Image */}
         {post.imageUrl && (
           <img
             src={post.imageUrl}
@@ -43,18 +72,16 @@ export function PostCard({ post }: PostCardProps) {
           />
         )}
 
-        {/* Interaction Buttons */}
         <div className="post-card-actions">
           <button
-            className="post-card-action-button like-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLiked(!isLiked);
-            }}
+            className={`post-card-action-button ${post.isLikedByUser ? 'liked' : ''}`}
+            onClick={handleLike}
+            disabled={!user || isLiking}
           >
             <Heart
               size={20}
-              className={isLiked ? "fill-red-500 text-red-500" : ""}
+              className={post.isLikedByUser ? "heart-icon liked" : "heart-icon"}
+              fill={post.isLikedByUser ? "currentColor" : "none"}
             />
             <span>{post.likesCount}</span>
           </button>
@@ -72,7 +99,10 @@ export function PostCard({ post }: PostCardProps) {
       </div>
 
       {isModalOpen && (
-        <PostModal post={post} onClose={() => setIsModalOpen(false)} />
+        <PostModal 
+          post={post} 
+          onClose={() => setIsModalOpen(false)}
+        />
       )}
     </>
   );
