@@ -8,16 +8,27 @@ class CommentRepository {
     authorId: string;
     content: string;
     postId: string;
+    authorInfo: {
+      firstName: string;
+      lastName: string;
+      profileImage: string;
+      userRole: string;
+    }
   }): Promise<Comment> {
     const comment = this.repository.create(commentData);
-    return await this.repository.save(comment);
+    const savedComment = await this.repository.save(comment);
+    
+    return this.repository.findOne({
+      where: { id: savedComment.id },
+      relations: ['post']
+    }) as Promise<Comment>;
   }
 
   async findByPostId(postId: string) {
     return this.repository
       .createQueryBuilder("comment")
       .where("comment.postId = :postId", { postId })
-      .orderBy("comment.createdAt", "DESC")
+      .orderBy("comment.created_at", "DESC")
       .getMany();
   }
 

@@ -6,6 +6,12 @@ interface CreateCommentRequest {
   content: string;
   authorId: string;
   postId: string;
+  authorInfo: {
+    firstName: string;
+    lastName: string;
+    profileImage: string;
+    userRole: string;
+  };
 }
 
 interface UpdateCommentRequest {
@@ -20,10 +26,9 @@ interface CommentContext extends ParameterizedContext {
 
 class CommentsController {
   async createComment(ctx: CommentContext) {
-    const { content, authorId, postId } = ctx.request
-      .body as CreateCommentRequest; //TODO typeguard
+    const { content, authorId, postId, authorInfo } = ctx.request.body as CreateCommentRequest;
 
-    if (!content || !authorId || !postId) {
+    if (!content || !authorId || !postId || !authorInfo) {
       ctx.status = 400;
       ctx.body = { error: "Missing required fields" };
       return;
@@ -37,14 +42,22 @@ class CommentsController {
         return;
       }
 
+      // TODO: check if authorId is a valid user and if the user is a valid user add his profile to the comment
+
       const comment = await commentRepository.create({
         content,
         authorId,
         postId,
+        authorInfo
       });
 
+      const updatedPost = await postRepository.findById(postId);
+
       ctx.status = 201;
-      ctx.body = comment;
+      ctx.body = {
+        comment,
+        post: updatedPost
+      };
     } catch (error) {
       ctx.status = 500;
       ctx.body = {
