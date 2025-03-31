@@ -25,7 +25,6 @@ body {
   padding: 0 1rem;
 }
 
-
 /* Auth Forms */
 .auth-container {
   min-height: 100vh;
@@ -203,7 +202,8 @@ small {
   color: var(--color-primary);
 }
 
-.skill-item, .contact-item {
+.skill-item,
+.contact-item {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
@@ -228,7 +228,8 @@ small {
   border-color: var(--color-primary);
 }
 
-.skill-item button, .contact-item button {
+.skill-item button,
+.contact-item button {
   padding: 0.25rem;
   background: none;
   border: none;
@@ -240,6 +241,45 @@ small {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.no-posts {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #888;
+  font-size: 1.2rem;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.no-posts-icon {
+  color: #ccc;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 @media (max-width: 768px) {

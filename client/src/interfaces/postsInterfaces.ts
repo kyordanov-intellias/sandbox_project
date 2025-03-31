@@ -28,3 +28,16 @@ export interface Comment {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface CreatePostRequest {
+  content: string;
+  imageUrl?: string;
+  authorId: string;
+  authorInfo: {
+    firstName: string;
+    lastName: string;
+    profileImage: string;
+    userRole: string;
+  };
+};
+
