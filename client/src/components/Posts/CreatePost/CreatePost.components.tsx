@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useUser } from "../../../context/UserContext";
+import { Plus } from "lucide-react";
 import "./CreatePost.styles.css";
+import { Post } from "../../../interfaces/postsInterfaces";
 
 interface CreatePostProps {
-  onPostCreated: (post: any) => void;
+  onPostCreated: (post: Post) => void;
 }
 
 export default function CreatePost({ onPostCreated }: CreatePostProps) {
@@ -51,6 +53,12 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setIsOpen(false);
+    }
+  };
+
   if (
     !user ||
     (user.userRole !== "mentor" && user.userRole !== "administrator")
@@ -59,45 +67,49 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
   }
 
   return (
-    <div className="create-post-container">
-      <button className="create-post-button" onClick={() => setIsOpen(true)}>
-        Create Post
+    <>
+      <button className="create-post-fab" onClick={() => setIsOpen(true)}>
+        <Plus size={24} />
       </button>
       {isOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Create a New Post</h2>
-            <form onSubmit={handleSubmit} className="post-form">
+        <div className="create-post-modal-overlay" onClick={handleOverlayClick}>
+          <div className="create-post-modal-content">
+            <h2 className="create-post-modal-title">Create a New Post</h2>
+            <form onSubmit={handleSubmit} className="create-post-form">
               <textarea
+                className="create-post-textarea"
                 placeholder="What's on your mind?"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 required
               />
               <input
+                className="create-post-input"
                 type="text"
                 placeholder="Image URL (optional)"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
               />
-              <button
-                type="submit"
-                disabled={loading}
-                className="submit-button"
-              >
-                {loading ? "Posting..." : "Post"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="close-button"
-              >
-                Cancel
-              </button>
+              <div className="create-post-button-group">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="create-post-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="create-post-submit"
+                >
+                  {loading ? "Posting..." : "Post"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
