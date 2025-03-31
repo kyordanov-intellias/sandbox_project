@@ -1,5 +1,6 @@
 import { AppDataSource } from "../db/data-source";
 import { Post } from "../models/Post.entity";
+import { Comment } from "../models/Comment.entity";
 
 class PostRepository {
   private repository = AppDataSource.getRepository(Post);
@@ -8,9 +9,16 @@ class PostRepository {
     authorId: string;
     content: string;
     imageUrl?: string;
+    authorInfo: {
+      firstName: string;
+      lastName: string;
+      profileImage: string;
+      userRole: string;
+    };
   }): Promise<Post> {
     const post = this.repository.create(postData);
-    return await this.repository.save(post);
+    const savedPost = await this.repository.save(post);
+    return this.findById(savedPost.id) as Promise<Post>;
   }
 
   async findById(id: string) {
@@ -26,6 +34,7 @@ class PostRepository {
       .createQueryBuilder("post")
       .leftJoinAndSelect("post.comments", "comments")
       .orderBy("post.created_at", "DESC")
+      .addOrderBy("comments.created_at", "DESC")
       .getMany();
   }
 
