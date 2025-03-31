@@ -17,13 +17,21 @@ import {
     @Column("uuid")
     authorId!: string;
   
+    @Column("jsonb")
+    authorInfo!: {
+      firstName: string;
+      lastName: string;
+      profileImage: string;
+      userRole: string;
+    };
+  
     @Column("text")
     content!: string;
   
-    @Column("uuid")
+    @Column("uuid", { name: "post_id" })
     postId!: string;
   
-    @ManyToOne(() => Post, post => post.comments, { onDelete: "CASCADE" })
+    @ManyToOne(() => Post, post => post.comments)
     @JoinColumn({ name: "post_id" })
     post!: Post;
   
