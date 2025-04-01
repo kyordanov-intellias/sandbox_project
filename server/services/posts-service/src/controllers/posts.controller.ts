@@ -1,10 +1,8 @@
 import { Context, ParameterizedContext } from "koa";
 import { postRepository } from "../repositories/posts.repository";
-import { AppDataSource } from "../db/data-source";
-import { Comment } from "../models/Comment.entity";
 import { likeRepository } from "../repositories/like.repository";
 
-interface CreatePostRequest {
+export interface CreatePostRequest {
   content: string;
   imageUrl?: string;
   authorId: string;
@@ -16,20 +14,16 @@ interface CreatePostRequest {
   };
 }
 
-interface CreateCommentRequest {
-  content: string;
-  authorId: string;
-}
-
-interface PostContext extends ParameterizedContext {
+export interface PostContext extends ParameterizedContext {
   request: Context["request"] & { body: CreatePostRequest };
 }
 
 class PostsController {
   async createPost(ctx: PostContext) {
-    const { content, imageUrl, authorId, authorInfo } = ctx.request.body;
+    const { content, imageUrl, authorInfo } = ctx.request.body;
+    const userId = ctx.state.user.userId;
 
-    if (!content || !authorId || !authorInfo) {
+    if (!content || !authorInfo) {
       ctx.status = 400;
       ctx.body = { error: "Missing required fields" };
       return;
@@ -39,7 +33,7 @@ class PostsController {
       const post = await postRepository.create({
         content,
         imageUrl,
-        authorId,
+        authorId: userId,
         authorInfo,
       });
 
@@ -172,31 +166,6 @@ class PostsController {
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: "Error unliking post" };
-    }
-  }
-
-  async getPostWithComments(ctx: Context) {
-    const { id } = ctx.params;
-    try {
-      const post = await postRepository.findById(id);
-
-      const comments = await AppDataSource
-        .getRepository(Comment)
-        .createQueryBuilder('comment')
-        .where('comment.postId = :postId', { postId: id })
-        .getMany();
-
-      ctx.body = {
-        post,
-        directComments: comments,
-        commentCount: comments.length
-      };
-    } catch (error) {
-      ctx.status = 500;
-      ctx.body = {
-        error: "Error fetching post with comments",
-        details: (error as Error).message
-      };
     }
   }
 }

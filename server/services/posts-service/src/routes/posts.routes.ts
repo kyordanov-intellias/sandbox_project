@@ -2,6 +2,7 @@ import Router from "@koa/router";
 import { postsController } from "../controllers/posts.controller";
 import { commentsController } from "../controllers/comments.controller";
 import { Context } from "koa";
+import { validateToken } from "../middlewares/auth.middleware";
 
 const router = new Router({ prefix: "/posts" });
 
@@ -12,16 +13,15 @@ router.get("/health", async (ctx: Context) => {
   };
 });
 
-router.post("/", postsController.createPost);
+router.post("/", validateToken, postsController.createPost);
 router.get("/", postsController.getAllPosts);
 router.get("/:id", postsController.getPost);
-router.post("/:id/like", postsController.likePost);
-router.post("/:id/dislike", postsController.dislikePost);
+router.post("/:id/like", validateToken, postsController.likePost);
+router.post("/:id/dislike", validateToken,postsController.dislikePost);
 //TODO make repost fn -> like the likes
 router.get("/:postId/comments", commentsController.getPostComments);
-router.post("/:postId/comments", commentsController.createComment);
-router.put("/comments/:id", commentsController.updateComment);
-router.delete("/comments/:id", commentsController.deleteComment);
-router.get("/user/:authorId/comments", commentsController.getUserComments);
+router.post("/:postId/comments", validateToken, commentsController.createComment);
+router.put("/comments/:id",validateToken, commentsController.updateComment);
+router.delete("/comments/:id", validateToken, commentsController.deleteComment);
 
 export { router as postsRouter };

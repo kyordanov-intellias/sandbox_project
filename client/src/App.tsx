@@ -11,9 +11,6 @@ import Profile from "./components/Profile/Profile.component";
 
 const Posts = lazy(() => import("./components/Posts/Posts.components"));
 const Admin = lazy(() => import("./components/Admin/Admin.component"));
-const CreatePost = lazy(
-  () => import("./components/CreatePost/CreatePost.component")
-);
 
 function App() {
   return (
@@ -61,14 +58,6 @@ function App() {
             element={
               <PrivateRoute requireAdmin>
                 <Admin />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/create-post"
-            element={
-              <PrivateRoute>
-                <CreatePost />
               </PrivateRoute>
             }
           />

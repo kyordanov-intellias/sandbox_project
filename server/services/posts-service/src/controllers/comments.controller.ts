@@ -120,17 +120,6 @@ class CommentsController {
       ctx.body = { error: "Error deleting comment" };
     }
   }
-
-  async getUserComments(ctx: Context) {
-    const { authorId } = ctx.params;
-    try {
-      const comments = await commentRepository.findByAuthorId(authorId);
-      ctx.body = comments;
-    } catch (error) {
-      ctx.status = 500;
-      ctx.body = { error: "Error fetching user comments" };
-    }
-  }
 }
 
 export const commentsController = new CommentsController();

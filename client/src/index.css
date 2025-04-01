@@ -25,7 +25,6 @@ body {
   padding: 0 1rem;
 }
 
-
 /* Auth Forms */
 .auth-container {
   min-height: 100vh;
@@ -203,7 +202,8 @@ small {
   color: var(--color-primary);
 }
 
-.skill-item, .contact-item {
+.skill-item,
+.contact-item {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
@@ -228,7 +228,8 @@ small {
   border-color: var(--color-primary);
 }
 
-.skill-item button, .contact-item button {
+.skill-item button,
+.contact-item button {
   padding: 0.25rem;
   background: none;
   border: none;

@@ -9,9 +9,10 @@ import "./PostCard.styles.css";
 interface PostCardProps {
   post: Post;
   onPostUpdate: (updatedPost: Post) => void;
+  fetchPosts: () => void;
 }
 
-export function PostCard({ post, onPostUpdate }: PostCardProps) {
+export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
@@ -102,6 +103,7 @@ export function PostCard({ post, onPostUpdate }: PostCardProps) {
         <PostModal 
           post={post} 
           onClose={() => setIsModalOpen(false)}
+          fetchPosts = {fetchPosts}
         />
       )}
     </>
