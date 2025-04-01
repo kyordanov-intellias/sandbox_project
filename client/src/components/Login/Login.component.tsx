@@ -63,6 +63,7 @@ const Login: FC = () => {
         setErrors(newErrors);
       } else if (error instanceof Error) {
         const serverError = error as ApiError;
+        // TODO typeguard
         if (serverError.response?.data?.error) {
           setErrors({
             server: serverError.response.data.error

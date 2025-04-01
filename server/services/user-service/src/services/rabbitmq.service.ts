@@ -83,6 +83,7 @@ export class RabbitMQService {
         if (msg) {
           try {
             const data = JSON.parse(msg.content.toString()) as UserCreatedEvent;
+            // TODO typeguard
             await handleMessage(data);
             this.channel.ack(msg);
           } catch (error) {

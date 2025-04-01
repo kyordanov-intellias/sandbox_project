@@ -1,6 +1,5 @@
 import { AppDataSource } from "../db/data-source";
 import { Profile } from "../models/Profile";
-import { FindOneOptions } from "typeorm";
 
 class ProfileRepository {
   private repository = AppDataSource.getRepository(Profile);
@@ -34,12 +33,11 @@ class ProfileRepository {
 
   async update(
     authId: string,
-    data: Partial<Omit<Profile, 'id' | 'authId' | 'created_at'>>
+    data: Partial<Omit<Profile, "id" | "authId" | "created_at">>
   ): Promise<Profile | null> {
     await this.repository.update({ authId: authId }, data);
     return this.findByAuthId(authId);
   }
-  
 
   async delete(authId: string): Promise<boolean> {
     const result = await this.repository.delete({ authId: authId });

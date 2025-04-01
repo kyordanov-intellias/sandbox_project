@@ -1,20 +1,38 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Edit2, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Edit2,
+  Trash2,
+  Heart,
+  Repeat,
+  HeartOff,
+  Repeat as RepeatOff,
+} from "lucide-react";
 import "./Profile.styles.css";
 import { useUser } from "../../context/UserContext";
 import { EditProfile } from "./Edit-Profile/EditProfile.component";
 import { EditFormData } from "../../interfaces/userInterfaces";
 import { DEFAULT_IMAGES } from "../Register/defaultImages";
 
-export const Profile = () => {
+export default function Profile() {
   const { user } = useUser();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [activeSection, setActiveSection] = useState<"liked" | "reposted">(
+    "liked"
+  );
   const handleEditProfile = (formData: EditFormData) => {
     console.log(formData);
     setIsEditModalOpen(false);
   };
+
+  //TODO - Practice data -> later with real posts
+  const likedPosts: any[] = [];
+  const repostedPosts: any[] = [];
+
+  //TODO -> add 3 more sections -> your posts, likes, reposts
+  //TODO -> followers
 
   return (
     <div className="profile-container">
@@ -36,7 +54,7 @@ export const Profile = () => {
           <div className="profile-info">
             <div className="name-section">
               <h1>{`${user?.profile?.firstName} ${user?.profile?.lastName}`}</h1>
-              <button 
+              <button
                 className="dropdown-trigger"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
@@ -119,18 +137,75 @@ export const Profile = () => {
           </div>
         </div>
 
-        <div className="profile-section">
-          <h2>You shared your opinion on</h2>
-          <div className="profile-posts">
-            <div className="post-card">
-              <h3>Post Title 1</h3>
-              <p>Your comment: "This is a great perspective on the topic..."</p>
+        <div className="posts-navigation">
+          <button
+            className={`posts-nav-button ${
+              activeSection === "liked" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("liked")}
+          >
+            <Heart size={20} />
+            Liked Posts
+          </button>
+          <button
+            className={`posts-nav-button ${
+              activeSection === "reposted" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("reposted")}
+          >
+            <Repeat size={20} />
+            Reposted
+          </button>
+        </div>
+
+        <div
+          className={`posts-section ${
+            activeSection === "liked" ? "active" : ""
+          }`}
+        >
+          {likedPosts.length > 0 ? (
+            <div className="profile-posts">
+              {likedPosts.map((post) => (
+                <div key={post.id} className="post-card">
+                  <h3>{post.title}</h3>
+                  <p>{post.content}</p>
+                  <span className="post-date">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="post-card">
-              <h3>Post Title 2</h3>
-              <p>Your comment: "I completely agree with this analysis..."</p>
+          ) : (
+            <div className="empty-posts">
+              <HeartOff size={48} />
+              <p>No liked posts yet</p>
             </div>
-          </div>
+          )}
+        </div>
+
+        <div
+          className={`posts-section ${
+            activeSection === "reposted" ? "active" : ""
+          }`}
+        >
+          {repostedPosts.length > 0 ? (
+            <div className="profile-posts">
+              {repostedPosts.map((post) => (
+                <div key={post.id} className="post-card">
+                  <h3>{post.title}</h3>
+                  <p>{post.content}</p>
+                  <span className="post-date">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-posts">
+              <RepeatOff size={48} />
+              <p>No reposted posts yet</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -146,4 +221,4 @@ export const Profile = () => {
       />
     </div>
   );
-};
+}
