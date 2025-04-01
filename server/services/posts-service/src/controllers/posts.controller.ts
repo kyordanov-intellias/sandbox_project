@@ -1,7 +1,5 @@
 import { Context, ParameterizedContext } from "koa";
 import { postRepository } from "../repositories/posts.repository";
-import { AppDataSource } from "../db/data-source";
-import { Comment } from "../models/Comment.entity";
 import { likeRepository } from "../repositories/like.repository";
 
 interface CreatePostRequest {
@@ -16,20 +14,16 @@ interface CreatePostRequest {
   };
 }
 
-interface CreateCommentRequest {
-  content: string;
-  authorId: string;
-}
-
 interface PostContext extends ParameterizedContext {
   request: Context["request"] & { body: CreatePostRequest };
 }
 
 class PostsController {
   async createPost(ctx: PostContext) {
-    const { content, imageUrl, authorId, authorInfo } = ctx.request.body;
+    const { content, imageUrl, authorInfo } = ctx.request.body;
+    const userId = ctx.state.user.userId;
 
-    if (!content || !authorId || !authorInfo) {
+    if (!content || !authorInfo) {
       ctx.status = 400;
       ctx.body = { error: "Missing required fields" };
       return;
@@ -39,7 +33,7 @@ class PostsController {
       const post = await postRepository.create({
         content,
         imageUrl,
-        authorId,
+        authorId: userId,
         authorInfo,
       });
 
