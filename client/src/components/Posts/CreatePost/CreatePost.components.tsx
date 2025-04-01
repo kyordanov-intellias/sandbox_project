@@ -3,17 +3,24 @@ import { useUser } from "../../../context/UserContext";
 import { Plus } from "lucide-react";
 import "./CreatePost.styles.css";
 import { Post } from "../../../interfaces/postsInterfaces";
+import { useNavigate } from "react-router-dom";
 
 interface CreatePostProps {
   onPostCreated: (post: Post) => void;
 }
 
 export default function CreatePost({ onPostCreated }: CreatePostProps) {
-  const { user } = useUser();
+  const { user, logout } = useUser();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleAuthError = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,16 +43,24 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
       const response = await fetch("http://localhost:4000/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(newPost),
       });
 
-      if (response.ok) {
-        const createdPost = await response.json();
-        onPostCreated(createdPost);
-        setContent("");
-        setImageUrl("");
-        setIsOpen(false);
+      if (!response.ok) {
+        const error = await response.json();
+        if (error.code === "NO_TOKEN" || error.code === "INVALID_TOKEN") {
+          handleAuthError();
+          return;
+        }
+        throw new Error(error.message || "Failed to create post");
       }
+
+      const createdPost = await response.json();
+      onPostCreated(createdPost);
+      setContent("");
+      setImageUrl("");
+      setIsOpen(false);
     } catch (error) {
       console.error("Error creating post:", error);
     } finally {

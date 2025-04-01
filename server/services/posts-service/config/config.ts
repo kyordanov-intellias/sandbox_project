@@ -11,5 +11,8 @@ export const configPostsFile = {
     username: process.env.POSTS_SERVICE_DB_USER || "postgres",
     password: process.env.POSTS_SERVICE_DB_PASSWORD || "postgres",
     database: process.env.POSTS_SERVICE_DB_NAME || "posts_db",
+  },
+  jwt: {
+    secret: process.env.AUTH_SERVICE_JWT_SECRET || "your-auth-secret-key",
   }
 };
