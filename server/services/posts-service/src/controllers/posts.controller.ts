@@ -2,7 +2,7 @@ import { Context, ParameterizedContext } from "koa";
 import { postRepository } from "../repositories/posts.repository";
 import { likeRepository } from "../repositories/like.repository";
 
-interface CreatePostRequest {
+export interface CreatePostRequest {
   content: string;
   imageUrl?: string;
   authorId: string;
@@ -14,7 +14,7 @@ interface CreatePostRequest {
   };
 }
 
-interface PostContext extends ParameterizedContext {
+export interface PostContext extends ParameterizedContext {
   request: Context["request"] & { body: CreatePostRequest };
 }
 
