@@ -22,6 +22,5 @@ router.get("/:postId/comments", commentsController.getPostComments);
 router.post("/:postId/comments", commentsController.createComment);
 router.put("/comments/:id", commentsController.updateComment);
 router.delete("/comments/:id", commentsController.deleteComment);
-router.get("/user/:authorId/comments", commentsController.getUserComments);
 
 export { router as postsRouter };

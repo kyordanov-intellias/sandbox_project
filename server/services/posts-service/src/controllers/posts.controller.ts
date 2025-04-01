@@ -174,31 +174,6 @@ class PostsController {
       ctx.body = { error: "Error unliking post" };
     }
   }
-
-  async getPostWithComments(ctx: Context) {
-    const { id } = ctx.params;
-    try {
-      const post = await postRepository.findById(id);
-
-      const comments = await AppDataSource
-        .getRepository(Comment)
-        .createQueryBuilder('comment')
-        .where('comment.postId = :postId', { postId: id })
-        .getMany();
-
-      ctx.body = {
-        post,
-        directComments: comments,
-        commentCount: comments.length
-      };
-    } catch (error) {
-      ctx.status = 500;
-      ctx.body = {
-        error: "Error fetching post with comments",
-        details: (error as Error).message
-      };
-    }
-  }
 }
 
 export const postsController = new PostsController();

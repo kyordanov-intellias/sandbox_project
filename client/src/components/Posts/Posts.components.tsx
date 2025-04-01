@@ -4,6 +4,7 @@ import { PostCard } from "./PostCard/PostCard.components";
 import { Post } from "../../interfaces/postsInterfaces";
 import CreatePost from "./CreatePost/CreatePost.components";
 import { MessageSquare } from "lucide-react";
+import "./Posts.styles.css";
 
 export default function Posts() {
   const { user } = useUser();
@@ -34,15 +35,7 @@ export default function Posts() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div
-      style={{
-        width: "70%",
-        margin: "0px auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "3rem",
-      }}
-    >
+    <div className="posts-container">
       {posts && posts.length > 0 ? (
         posts.map((post) => (
           <PostCard
@@ -60,7 +53,6 @@ export default function Posts() {
         <div className="no-posts">
           <MessageSquare className="no-posts-icon" size={48} />
           <p>No posts yet</p>
-          
         </div>
       )}
 
