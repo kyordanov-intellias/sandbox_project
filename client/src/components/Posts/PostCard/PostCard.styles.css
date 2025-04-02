@@ -5,6 +5,7 @@
   padding: 1rem;
   cursor: pointer;
   transition: box-shadow 0.2s ease;
+  width: 600px;
 }
 
 .post-card:hover {
