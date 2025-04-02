@@ -175,6 +175,10 @@
     min-width: unset;
     height: 60%;
   }
+
+  .modal-comments-title {
+    display: none;
+  }
 }
 
 .edit-comment-form {
