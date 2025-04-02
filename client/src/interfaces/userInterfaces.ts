@@ -1,4 +1,3 @@
-
 export interface LoginUserInterface {
   email: string;
   password: string;
@@ -31,7 +30,7 @@ export interface User {
     firstName: string;
     id: string;
     lastName: string;
-    role: string;
+    userRole: string;
     profileImage?: string;
     coverImage?: string;
     skills: Array<{

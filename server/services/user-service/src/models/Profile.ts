@@ -25,7 +25,7 @@ export class Profile {
   @Column({ name: 'last_name' })
   lastName!: string;
 
-  @Column({ name: 'role' })
+  @Column({ name: 'user_role' })
   userRole!: string;
 
   @OneToMany(() => ProfileSkill, profileSkill => profileSkill.profile)
