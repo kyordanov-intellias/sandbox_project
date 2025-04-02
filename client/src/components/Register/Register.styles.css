@@ -52,3 +52,159 @@
     font-size: 0.875rem;
     margin-top: 0.25rem;
   }
+
+.register__form-section {
+  margin-bottom: 1.5rem;
+}
+
+.register__form-section-title {
+  font-size: 1rem;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.register__input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.register__input-row input,
+.register__input-row select {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.register__input-row input {
+  flex: 2;
+}
+
+.register__input-row select {
+  flex: 1;
+}
+
+.register__remove-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register__add-btn {
+  color: var(--color-secondary);
+  background: none;
+  border: 1px solid var(--color-secondary);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.register__add-btn:hover {
+  background-color: var(--color-light);
+}
+
+.register__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  margin: 0 4px;
+}
+
+.register__checkbox-label input[type="checkbox"] {
+  height: 16px;
+  width: 16px;
+}
+
+/* Adjust the contact inputs specifically */
+.register__input-row--contact {
+  display: grid;
+  grid-template-columns: 120px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.register__input-row--contact select {
+  width: 100%;
+}
+
+.register__input-row--contact input[type="text"] {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .register__input-row--contact {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .register__checkbox-label {
+    justify-content: flex-start;
+  }
+}
+
+.register__file-input-container {
+  margin-top: 8px;
+}
+
+.register__file-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid var(--color-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-secondary);
+}
+
+.register__file-input {
+  display: none;
+}
+
+.register__file-label:hover {
+  background-color: var(--color-light);
+}
+
+.register__selected-file {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.register__image-preview {
+  margin-top: 12px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-light);
+}
+
+.register__image-preview--cover {
+  width: 100%;
+  height: 170px;
+  border-radius: 8px;
+}
+
+.register__image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
