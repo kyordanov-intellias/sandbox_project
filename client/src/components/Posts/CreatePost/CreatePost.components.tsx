@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import "./CreatePost.styles.css";
 import { Post } from "../../../interfaces/postsInterfaces";
 import { useNavigate } from "react-router-dom";
+import { useCloudinaryUpload } from "../../../hooks/useCloudinaryUpload";
 
 interface CreatePostProps {
   onPostCreated: (post: Post) => void;
@@ -16,6 +17,12 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const {
+    uploading: uploadingImage,
+    error: imageError,
+    uploadImage
+  } = useCloudinaryUpload();
 
   const handleAuthError = async () => {
     await logout();
@@ -74,6 +81,16 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const uploadedUrl = await uploadImage(file);
+    if (uploadedUrl) {
+      setImageUrl(uploadedUrl);
+    }
+  };
+
   if (
     !user ||
     (user.userRole !== "mentor" && user.userRole !== "administrator")
@@ -98,13 +115,27 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
                 onChange={(e) => setContent(e.target.value)}
                 required
               />
-              <input
-                className="create-post-input"
-                type="text"
-                placeholder="Image URL (optional)"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-              />
+              
+              <div className="image-upload-container">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="file-input"
+                />
+                {imageUrl && (
+                  <div className="image-preview post-image-preview">
+                    <img src={imageUrl} alt="Post preview" />
+                  </div>
+                )}
+                {uploadingImage && (
+                  <div className="upload-status">Uploading...</div>
+                )}
+                {imageError && (
+                  <div className="error-message">{imageError}</div>
+                )}
+              </div>
+
               <div className="create-post-button-group">
                 <button
                   type="button"
@@ -115,7 +146,7 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || uploadingImage}
                   className="create-post-submit"
                 >
                   {loading ? "Posting..." : "Post"}
