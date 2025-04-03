@@ -1,6 +1,6 @@
 import { AppDataSource } from "../db/data-source";
 import { Profile } from "../models/Profile";
-import { FindOneOptions } from "typeorm";
+import { FindOneOptions, ILike } from "typeorm";
 
 class ProfileRepository {
   private repository = AppDataSource.getRepository(Profile);
@@ -46,8 +46,16 @@ class ProfileRepository {
     return result.affected ? result.affected > 0 : false;
   }
 
-  async getAllUsers():Promise<Profile[] | null>{
-    return await this.repository.find();
+  async searchUsers(query: string, limit: number = 10, offset: number = 0): Promise<Profile[]> {
+    return await this.repository.find({
+      where: [
+        { firstName: ILike(`%${query}%`) },
+        { lastName: ILike(`%${query}%`) },
+      ],
+      take: limit,
+      skip: offset,
+      select: ['id', 'firstName', 'lastName', 'profileImage'],
+    });
   }
 }
 
