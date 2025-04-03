@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Home, MessageSquare, Users, User, ShieldUser } from "lucide-react";
+import { Home, MessageSquare, ShieldUser, BookUser } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import "./Header.styles.css";
 
@@ -74,8 +74,7 @@ const Header: FC = () => {
 
         <nav className="nav-links">
           <Link to="/posts" className="nav-link">
-            <Users size={20} />
-            Posts
+            <BookUser size={24} />
           </Link>
           {!user ? (
             <Link to="/login" className="join-button">
@@ -84,19 +83,21 @@ const Header: FC = () => {
           ) : (
             <>
               <Link to="/messenger" className="nav-link">
-                <MessageSquare size={20} />
-                Messenger
-              </Link>
-              <Link to={`/profile/${user.id}`} className="nav-link">
-                <User size={20} />
-                Profile
+                <MessageSquare size={24} />
               </Link>
               {user.userRole === "administrator" && (
                 <Link to={`/admin`} className="nav-link">
-                  <ShieldUser size={20} />
-                  Admin
+                  <ShieldUser size={24} />
                 </Link>
               )}
+              <Link to={`/profile/${user.id}`} className="nav-link">
+                <img
+                  className="header-profile-img"
+                  src={user.profile?.profileImage || "/default-avatar.png"}
+                  alt="user-profile-img"
+                />
+              </Link>
+
               <button className="logout-button" onClick={logout}>
                 Log out
               </button>

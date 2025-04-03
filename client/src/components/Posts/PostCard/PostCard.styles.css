@@ -1,0 +1,168 @@
+.post-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  padding: 16px;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  max-width: 500px;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-card-author {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.post-card-avatar-link {
+  display: block;
+  margin-right: 12px;
+}
+
+.post-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-card-author-name {
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.post-card-author-name:hover {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.post-card-content {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.post-card-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.post-card-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.post-card-action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.post-card-action-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.post-card-action-button.liked {
+  color: #e74c3c;
+}
+
+.heart-icon.liked {
+  color: #e74c3c;
+}
+
+.post-card-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.heart-icon {
+  transition: all 0.2s;
+}
+
+.heart-icon:not(.liked) {
+  color: #666;
+}
+
+.post-card-action-button:hover .heart-icon:not(.liked) {
+  color: #333;
+}
+
+.like-button:hover {
+  color: var(--color-red-500);
+}
+
+.comment-button:hover {
+  color: var(--color-blue-500);
+}
+
+.repost-button:hover {
+  color: var(--color-green-500);
+}
+
+.group {
+  position: relative;
+}
+
+.group:hover > div:last-child {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .post-card {
+    margin: 16px auto;
+    width: calc(100% - 32px);
+  }
+
+  .post-card-image {
+    max-height: 300px;
+  }
+
+  .post-card-actions {
+    justify-content: space-around;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .post-card {
+    padding: 12px;
+  }
+
+  .post-card-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .post-card-content {
+    font-size: 14px;
+  }
+
+  .post-card-action-button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}

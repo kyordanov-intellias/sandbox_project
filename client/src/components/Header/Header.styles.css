@@ -119,3 +119,11 @@
 .search-input:focus {
   outline: none;
 }
+
+/* Profile image in the header */
+.header-profile-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 16px;
+  object-fit: cover;
+}

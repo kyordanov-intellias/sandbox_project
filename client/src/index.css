@@ -25,7 +25,6 @@ body {
   padding: 0 1rem;
 }
 
-
 /* Auth Forms */
 .auth-container {
   min-height: 100vh;
@@ -201,57 +200,4 @@ small {
 .form-section h3 {
   margin-bottom: 1rem;
   color: var(--color-primary);
-}
-
-.skill-item, .contact-item {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  align-items: center;
-}
-
-.add-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--color-light);
-  border: 1px dashed var(--color-border);
-  border-radius: 4px;
-  color: var(--color-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.add-button:hover {
-  background: var(--color-background);
-  border-color: var(--color-primary);
-}
-
-.skill-item button, .contact-item button {
-  padding: 0.25rem;
-  background: none;
-  border: none;
-  color: var(--color-error);
-  cursor: pointer;
-}
-
-.contact-item label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
-  }
-
-  .hero h1 {
-    font-size: 2.5rem;
-  }
-
-  .section-title {
-    font-size: 2rem;
-  }
 }

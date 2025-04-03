@@ -36,6 +36,7 @@ services:
     depends_on:
       - auth-service
       - user-service
+      - posts-service
     container_name: gateway-service
     tty: true
     networks:
@@ -59,7 +60,7 @@ services:
     depends_on:
       - postgres_auth
       - redis
-      - rabbitmq 
+      - rabbitmq
     tty: true
     networks:
       - app-network
@@ -82,6 +83,27 @@ services:
     depends_on:
       - postgres_user
       - rabbitmq
+    tty: true
+    networks:
+      - app-network
+
+  posts-service:
+    build:
+      context: ./server/services/posts-service
+      dockerfile: Dockerfile
+    ports:
+      - "${POSTS_SERVICE_PORT:-4003}:${POSTS_SERVICE_PORT:-4003}"
+    volumes:
+      - ./server/services/posts-service:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    command: npx ts-node-dev --respawn --transpile-only --poll src/index.ts
+    environment:
+      - NODE_ENV=development
+    container_name: posts-service
+    depends_on:
+      - postgres_posts
     tty: true
     networks:
       - app-network
@@ -119,6 +141,22 @@ services:
     networks:
       - app-network
 
+  postgres_posts:
+    image: postgres:latest
+    container_name: postgres_posts
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: posts_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_posts_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
   redis:
     image: redis:latest
     container_name: redis
@@ -134,8 +172,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"   # AMQP protocol port
-      - "15672:15672" # Management UI port
+      - "5672:5672"
+      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin123
@@ -147,6 +185,7 @@ services:
 volumes:
   postgres_auth_data:
   postgres_user_data:
+  postgres_posts_data:
   redis_data:
   rabbitmq_data:
 

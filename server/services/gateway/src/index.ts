@@ -30,6 +30,14 @@ app.use(
   })
 );
 
+app.use(
+  proxy("/posts", {
+    target: "http://posts-service:4003",
+    changeOrigin: true,
+    logs: true,
+  })
+);
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 

@@ -8,7 +8,7 @@ import type {
   SkillInput,
   ContactInput,
 } from "../../interfaces/userInterfaces";
-import './Register.styles.css';
+import "./Register.styles.css";
 import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
 import { DEFAULT_IMAGES } from "./defaultImages";
 
@@ -56,23 +56,34 @@ const Register: React.FC = () => {
     coverImage: DEFAULT_IMAGES.cover,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { uploading: uploadingProfile, error: profileError, uploadImage: uploadProfileImage } = useCloudinaryUpload();
-  const { uploading: uploadingCover, error: coverError, uploadImage: uploadCoverImage } = useCloudinaryUpload();
+  const {
+    uploading: uploadingProfile,
+    error: profileError,
+    uploadImage: uploadProfileImage,
+  } = useCloudinaryUpload();
+  const {
+    uploading: uploadingCover,
+    error: coverError,
+    uploadImage: uploadCoverImage,
+  } = useCloudinaryUpload();
 
-  const handleImageUpload = (type: 'profile' | 'cover') => async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload =
+    (type: "profile" | "cover") =>
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    const uploadFn = type === 'profile' ? uploadProfileImage : uploadCoverImage;
-    const imageUrl = await uploadFn(file);
+      const uploadFn =
+        type === "profile" ? uploadProfileImage : uploadCoverImage;
+      const imageUrl = await uploadFn(file);
 
-    if (imageUrl) {
-      setFormData(prev => ({
-        ...prev,
-        [type === 'profile' ? 'profileImage' : 'coverImage']: imageUrl
-      }));
-    }
-  };
+      if (imageUrl) {
+        setFormData((prev) => ({
+          ...prev,
+          [type === "profile" ? "profileImage" : "coverImage"]: imageUrl,
+        }));
+      }
+    };
 
   const getPasswordStrength = (
     password: string
@@ -112,7 +123,11 @@ const Register: React.FC = () => {
     }));
   };
 
-  const updateSkill = (index: number, field: keyof SkillInput, value: string) => {
+  const updateSkill = (
+    index: number,
+    field: keyof SkillInput,
+    value: string
+  ) => {
     setFormData((prev) => ({
       ...prev,
       skills: prev.skills.map((skill, i) =>
@@ -163,7 +178,7 @@ const Register: React.FC = () => {
       if (response.ok) {
         setTimeout(() => {
           navigate("/login");
-        }, 2000);
+        }, 1000);
       } else {
         setErrors(data.error || "Registration failed!");
       }
@@ -198,7 +213,7 @@ const Register: React.FC = () => {
           <button
             type="button"
             className="auth-toggle-button active"
-            onClick={() => { }}
+            onClick={() => {}}
           >
             Sign Up
           </button>
@@ -206,41 +221,57 @@ const Register: React.FC = () => {
 
         <div className="form-section images-section">
           <div className="form-group">
-            <label htmlFor="profileImage">Profile Picture</label>
-            <div className="image-upload-container">
-              <input
-                type="file"
-                id="profileImage"
-                accept="image/*"
-                onChange={(e) => handleImageUpload('profile')(e)}
-                className="file-input"
-              />
-              {formData.profileImage && (
-                <div className="image-preview">
-                  <img src={formData.profileImage} alt="Profile preview" />
-                </div>
+            <label>Profile Picture</label>
+            <div className="register__file-input-container">
+              <label className="register__file-label">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload("profile")(e)}
+                  className="register__file-input"
+                />
+                Select Image
+              </label>
+              {formData.profileImage !== DEFAULT_IMAGES.profile && (
+                <>
+                  <div className="register__selected-file">Image selected</div>
+                  <div className="register__image-preview">
+                    <img src={formData.profileImage} alt="Profile preview" />
+                  </div>
+                </>
               )}
-              {uploadingProfile && <div className="upload-status">Uploading...</div>}
-              {profileError && <div className="error-message">{profileError}</div>}
+              {uploadingProfile && (
+                <div className="upload-status">Uploading...</div>
+              )}
+              {profileError && (
+                <div className="error-message">{profileError}</div>
+              )}
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="coverImage">Cover Image</label>
-            <div className="image-upload-container">
-              <input
-                type="file"
-                id="coverImage"
-                accept="image/*"
-                onChange={(e) => handleImageUpload('cover')(e)}
-                className="file-input"
-              />
-              {formData.coverImage && (
-                <div className="image-preview cover-preview">
-                  <img src={formData.coverImage} alt="Cover preview" />
-                </div>
+            <label>Cover Image</label>
+            <div className="register__file-input-container">
+              <label className="register__file-label">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload("cover")(e)}
+                  className="register__file-input"
+                />
+                Select Image
+              </label>
+              {formData.coverImage !== DEFAULT_IMAGES.cover && (
+                <>
+                  <div className="register__selected-file">Image selected</div>
+                  <div className="register__image-preview register__image-preview--cover">
+                    <img src={formData.coverImage} alt="Cover preview" />
+                  </div>
+                </>
               )}
-              {uploadingCover && <div className="upload-status">Uploading...</div>}
+              {uploadingCover && (
+                <div className="upload-status">Uploading...</div>
+              )}
               {coverError && <div className="error-message">{coverError}</div>}
             </div>
           </div>
@@ -344,10 +375,10 @@ const Register: React.FC = () => {
         </div>
 
         {/* Skills Section */}
-        <div className="form-section">
-          <h3>Skills</h3>
+        <div className="register__form-section">
+          <h3 className="register__form-section-title">Skills</h3>
           {formData.skills.map((skill, index) => (
-            <div key={index} className="skill-item">
+            <div key={index} className="register__input-row">
               <input
                 type="text"
                 placeholder="Skill name"
@@ -364,21 +395,37 @@ const Register: React.FC = () => {
                 <option value="intermediate">Intermediate</option>
                 <option value="expert">Expert</option>
               </select>
-              <button type="button" onClick={() => removeSkill(index)}>
+              <button
+                type="button"
+                className="register__remove-btn"
+                onClick={() => removeSkill(index)}
+              >
                 <X size={16} />
               </button>
+              {(!skill.name || errors[`skills.${index}.name`]) && (
+                <div className="error-message">
+                  {errors[`skills.${index}.name`] || "Skill name is required"}
+                </div>
+              )}
             </div>
           ))}
-          <button type="button" onClick={addSkill} className="add-button">
+          <button
+            type="button"
+            className="register__add-btn"
+            onClick={addSkill}
+          >
             <Plus size={16} /> Add Skill
           </button>
         </div>
 
         {/* Contacts Section */}
-        <div className="form-section">
-          <h3>Contacts</h3>
+        <div className="register__form-section">
+          <h3 className="register__form-section-title">Contacts</h3>
           {formData.contacts.map((contact, index) => (
-            <div key={index} className="contact-item">
+            <div
+              key={index}
+              className="register__input-row register__input-row--contact"
+            >
               <select
                 value={contact.type}
                 onChange={(e) => updateContact(index, "type", e.target.value)}
@@ -394,7 +441,7 @@ const Register: React.FC = () => {
                 value={contact.value}
                 onChange={(e) => updateContact(index, "value", e.target.value)}
               />
-              <label>
+              <label className="register__checkbox-label">
                 <input
                   type="checkbox"
                   checked={contact.isPrimary}
@@ -404,12 +451,26 @@ const Register: React.FC = () => {
                 />
                 Primary
               </label>
-              <button type="button" onClick={() => removeContact(index)}>
+              <button
+                type="button"
+                className="register__remove-btn"
+                onClick={() => removeContact(index)}
+              >
                 <X size={16} />
               </button>
+              {(!contact.value || errors[`contacts.${index}.value`]) && (
+                <div className="error-message">
+                  {errors[`contacts.${index}.value`] ||
+                    "Contact value is required"}
+                </div>
+              )}
             </div>
           ))}
-          <button type="button" onClick={addContact} className="add-button">
+          <button
+            type="button"
+            className="register__add-btn"
+            onClick={addContact}
+          >
             <Plus size={16} /> Add Contact
           </button>
         </div>

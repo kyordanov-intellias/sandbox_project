@@ -1,5 +1,3 @@
-import { FC } from "react";
-
-export const Admin: FC = () => {
+export default function Admin() {
   return <div>Admin page</div>;
 };

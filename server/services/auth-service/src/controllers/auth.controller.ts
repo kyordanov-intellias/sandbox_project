@@ -1,4 +1,4 @@
-import { Context } from "koa";
+import { Context, ParameterizedContext } from "koa";
 import { userRepository } from "../repositories/user.repository";
 import { configAuthFile } from "../../config/config";
 import jwt, { SignOptions } from "jsonwebtoken";
@@ -29,19 +29,27 @@ interface LoginRequest {
   password: string;
 }
 
+interface RegisterContext extends ParameterizedContext {
+  request: Context["request"] & { body: RegisterRequest };
+}
+
+interface LoginContext extends ParameterizedContext {
+  request: Context["request"] & { body: LoginRequest };
+}
+
 export class AuthController {
-  async register(ctx: Context) {
-    const { 
-      firstName, 
-      lastName, 
-      email, 
-      password, 
-      userRole, 
-      skills, 
+  async register(ctx: RegisterContext) {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      userRole,
+      skills,
       contacts,
       profileImage,
-      coverImage 
-    } = ctx.request.body as RegisterRequest;
+      coverImage,
+    } = ctx.request.body;
 
     const requiredFields = [
       "firstName",
@@ -97,8 +105,8 @@ export class AuthController {
     }
   }
 
-  async login(ctx: Context) {
-    const { email, password } = ctx.request.body as LoginRequest;
+  async login(ctx: LoginContext) {
+    const { email, password } = ctx.request.body;
     const requiredFields = ["email", "password"];
 
     const validationError = userRepository.validateRequestBody(
@@ -133,7 +141,7 @@ export class AuthController {
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         configAuthFile.jwt.secret,
-        { expiresIn: configAuthFile.jwt.expiresIn } as SignOptions // type
+        { expiresIn: configAuthFile.jwt.expiresIn } as SignOptions // TODO typeguard
       );
 
       await redis.set(`auth_token:${user.id}`, token, "EX", 86400);
@@ -156,7 +164,7 @@ export class AuthController {
     try {
       const token = ctx.cookies.get("authToken");
 
-      //check the logic
+      //TODO check the logic
       if (token) {
         await redis.set(`bl_${token}`, "1", "EX", 24 * 60 * 60);
       }
@@ -191,6 +199,7 @@ export class AuthController {
         decoded = jwt.verify(token, configAuthFile.jwt.secret) as {
           userId: string;
         };
+        // TODO tpyeguard
       } catch (error) {
         ctx.status = 401;
         ctx.body = { error: "Unauthorized - Invalid token" };
@@ -213,8 +222,7 @@ export class AuthController {
   }
 
   async getUserByEmail(ctx: Context) {
-    const { email } = ctx.params as { email: string };
-
+    const { email } = ctx.params;
     if (!email) {
       ctx.status = 400;
       ctx.body = { error: "Email is required" };
@@ -239,8 +247,7 @@ export class AuthController {
   }
 
   async deleteUserByEmail(ctx: Context) {
-    const { email } = ctx.params as { email: string };
-
+    const { email } = ctx.params;
     if (!email) {
       ctx.status = 400;
       ctx.body = { error: "Email is required" };
@@ -257,6 +264,7 @@ export class AuthController {
       }
 
       await userRepository.deleteByEmail(email);
+      // TODO Add rabbitmq message to inform user-service to delete user as well
 
       ctx.status = 200;
       ctx.body = { message: `User with email ${email} has been deleted.` };

@@ -71,11 +71,16 @@ export class UserHandlerService {
         profileSkill.profile = savedProfile;
         profileSkill.skill = skill;
 
-        const level = skillData.proficiencyLevel?.toUpperCase();
-        if (level && Object.keys(ProficiencyLevel).includes(level)) {
-          profileSkill.proficiencyLevel = ProficiencyLevel[level as keyof typeof ProficiencyLevel];
+        const levelMap: Record<string, ProficiencyLevel> = {
+          'beginner': ProficiencyLevel.BEGINNER,
+          'intermediate': ProficiencyLevel.INTERMEDIATE,
+          'expert': ProficiencyLevel.EXPERT
+        };
+        
+        if (skillData.proficiencyLevel && levelMap[skillData.proficiencyLevel]) {
+          profileSkill.proficiencyLevel = levelMap[skillData.proficiencyLevel];
         } else {
-          profileSkill.proficiencyLevel = ProficiencyLevel.BEGINNER; // fallback if invalid or missing
+          profileSkill.proficiencyLevel = ProficiencyLevel.BEGINNER;
         }
 
         await queryRunner.manager.save(profileSkill);

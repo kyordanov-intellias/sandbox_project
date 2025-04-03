@@ -1,11 +1,3 @@
-export interface RegisterUserInterface {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  userRole: string;
-}
-
 export interface LoginUserInterface {
   email: string;
   password: string;
@@ -38,7 +30,7 @@ export interface User {
     firstName: string;
     id: string;
     lastName: string;
-    role: string;
+    userRole: string;
     profileImage?: string;
     coverImage?: string;
     skills: Array<{
@@ -87,4 +79,30 @@ export interface RegisterForm {
   contacts: ContactInput[];
   profileImage: string;
   coverImage: string;
+}
+
+
+export interface UserProfileInterface {
+  id: string;
+  authId: string;
+  profileImage: string;
+  coverImage: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  userRole: string;
+  skills: {
+    id: string;
+    proficiencyLevel: string;
+    skill: {
+      id: string;
+      name: string;
+    };
+  }[];
+  contacts: {
+    id: string;
+    type: string;
+    value: string;
+    isPrimary: boolean;
+  }[];
 }
