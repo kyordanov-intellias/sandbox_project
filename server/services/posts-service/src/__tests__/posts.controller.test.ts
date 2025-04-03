@@ -34,7 +34,20 @@ describe("PostsController", () => {
       params: {},
       query: {},
       status: 200,
-      body: {}
+      body: {},
+      cookies: {
+        get: jest.fn().mockReturnValue('mock-token'),
+        set: jest.fn(),
+        secure: true,
+        request: {} as any,
+        response: {} as any
+      },
+      state: {
+        user: {
+          userId: 'user123',
+          email: 'test@example.com'
+        }
+      }
     };
     jest.clearAllMocks();
   });

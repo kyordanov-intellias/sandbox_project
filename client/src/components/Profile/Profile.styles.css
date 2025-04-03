@@ -84,13 +84,14 @@
 
 .detail-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 }
 
 .detail-item strong {
   min-width: 120px;
   color: var(--color-primary-dark);
+  flex-shrink: 0;
 }
 
 .detail-item span {
@@ -328,4 +329,104 @@
   .posts-nav-button {
     padding: 0.75rem 1rem;
   }
+}
+
+.skills-container,
+.contacts-container {
+  align-items: center !important;
+  justify-content: center;
+}
+
+.skills-list,
+.contacts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.skill-tag {
+  background-color: var(--color-light);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-name {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.skill-level {
+  color: var(--color-secondary);
+  font-size: 0.8rem;
+  padding-left: 6px;
+  border-left: 1px solid var(--color-secondary);
+}
+
+.contact-item {
+  background-color: var(--color-light);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.no-data {
+  color: var(--color-secondary);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .skills-container,
+  .contacts-container {
+    align-items: flex-start !important;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .detail-item strong {
+    min-width: auto;
+  }
+
+  .skills-list,
+  .contacts-list {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .skill-tag,
+  .contact-item {
+    font-size: 0.85rem;
+  }
+}
+
+.follow-button {
+  background-color: #5483b3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.follow-button:hover {
+  background-color: #406a91;
+}
+
+.follow-button.following {
+  background-color: #ff6b6b;
+}
+
+.follow-button.following:hover {
+  background-color: #e05858;
 }
