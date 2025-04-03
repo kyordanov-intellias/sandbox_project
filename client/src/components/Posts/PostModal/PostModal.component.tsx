@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Post } from "../../../interfaces/postsInterfaces";
 import { CreateComment } from "../CreateComment/CreateComment.component";
 import "./PostModal.styles.css";
-import { CommentActions } from './CommentAction/CommentAction.component';
+import { CommentActions } from "./CommentAction/CommentAction.component";
 import { useUser } from "../../../context/UserContext";
 
 interface PostModalProps {
@@ -20,7 +20,9 @@ interface EditingComment {
 
 export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
   const [currentPost, setCurrentPost] = useState(post);
-  const [editingComment, setEditingComment] = useState<EditingComment | null>(null);
+  const [editingComment, setEditingComment] = useState<EditingComment | null>(
+    null
+  );
   const { user } = useUser();
 
   const sortedComments = [...currentPost.comments].sort(
@@ -41,35 +43,41 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
 
   const handleEditComment = async (commentId: string, newContent: string) => {
     try {
-      const response = await fetch(`http://localhost:4000/posts/comments/${commentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: newContent }),
-      });
+      const response = await fetch(
+        `http://localhost:4000/posts/comments/${commentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ content: newContent }),
+        }
+      );
 
-      if (!response.ok) throw new Error('Failed to update comment');
+      if (!response.ok) throw new Error("Failed to update comment");
 
       await handleCommentCreated();
       setEditingComment(null);
     } catch (error) {
-      console.error('Error updating comment:', error);
+      console.error("Error updating comment:", error);
     }
   };
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      const response = await fetch(`http://localhost:4000/posts/comments/${commentId}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `http://localhost:4000/posts/comments/${commentId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
-      if (!response.ok) throw new Error('Failed to delete comment');
-
-      // Refresh the post data to get updated comments
+      if (!response.ok) throw new Error("Failed to delete comment");
       await handleCommentCreated();
     } catch (error) {
-      console.error('Error deleting comment:', error);
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -130,13 +138,17 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
                         to={`/profile/${comment.authorId}`}
                         className="comment-author-name"
                       >
-                        {comment.authorInfo.firstName} {comment.authorInfo.lastName}
+                        {comment.authorInfo.firstName}{" "}
+                        {comment.authorInfo.lastName}
                       </Link>
                       <CommentActions
                         isAuthor={user?.id === comment.authorId}
-                        isAdmin={user?.userRole === 'administrator'}
+                        isAdmin={user?.userRole === "administrator"}
                         onEdit={() => {
-                          setEditingComment({ id: comment.id, content: comment.content });
+                          setEditingComment({
+                            id: comment.id,
+                            content: comment.content,
+                          });
                         }}
                         onDelete={() => handleDeleteComment(comment.id)}
                       />
@@ -145,14 +157,21 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
                       <div className="edit-comment-form">
                         <textarea
                           value={editingComment.content}
-                          onChange={(e) => setEditingComment({ 
-                            ...editingComment, 
-                            content: e.target.value 
-                          })}
+                          onChange={(e) =>
+                            setEditingComment({
+                              ...editingComment,
+                              content: e.target.value,
+                            })
+                          }
                         />
                         <div className="edit-comment-buttons">
                           <button
-                            onClick={() => handleEditComment(comment.id, editingComment.content)}
+                            onClick={() =>
+                              handleEditComment(
+                                comment.id,
+                                editingComment.content
+                              )
+                            }
                             className="edit-save-button"
                           >
                             Save

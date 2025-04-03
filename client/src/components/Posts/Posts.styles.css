@@ -1,53 +1,76 @@
 .posts-container {
-    width: 70%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    padding-bottom: 80px; /* Add space for the floating create post button */
+  width: 70%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  padding-bottom: 80px; /* Add space for the floating create post button */
+}
+
+.no-posts {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #888;
+  font-size: 1.2rem;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.no-posts-icon {
+  color: #ccc;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  
-  .no-posts {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #888;
-    font-size: 1.2rem;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    animation: fadeIn 0.8s ease-in-out;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .no-posts-icon {
-    color: #ccc;
-    animation: bounce 1.5s infinite;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #fff;
+  border-bottom-color: #ff3d00;
+  border-radius: 50%;
+  display: block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin: 30vh auto;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  100% {
+    transform: rotate(360deg);
   }
-  
-  @keyframes bounce {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-5px);
-    }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
   }
-  
-  @media (max-width: 768px) {
-    .posts-container {
-      width: 90%;
-    }
+  50% {
+    transform: translateY(-5px);
   }
+}
+
+@media (max-width: 768px) {
+  .posts-container {
+    width: 90%;
+  }
+}

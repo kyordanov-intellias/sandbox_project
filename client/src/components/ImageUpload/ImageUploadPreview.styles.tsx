@@ -23,8 +23,9 @@ export const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPreview(reader.result as string);
-      // TODO typegard
+      if (typeof reader.result === "string") {
+        setPreview(reader.result);
+      }
     };
     reader.readAsDataURL(file);
 

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Header from "./components/Header/Header.component";
@@ -16,53 +16,51 @@ function App() {
   return (
     <>
       <Header />
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/posts" element={<Posts />} />
-          <Route
-            path="/messenger"
-            element={
-              <PrivateRoute>
-                <h1>Messenger Page</h1>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profile/:profileId"
-            // TODO -> in future you can search other users
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <AuthRoute>
-                <Login />
-              </AuthRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <AuthRoute>
-                <Register />
-              </AuthRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute requireAdmin>
-                <Admin />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Suspense>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/posts" element={<Posts />} />
+        <Route
+          path="/messenger"
+          element={
+            <PrivateRoute>
+              <h1>Messenger Page</h1>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile/:profileId"
+          // TODO -> in future you can search other users
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <AuthRoute>
+              <Login />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthRoute>
+              <Register />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute requireAdmin>
+              <Admin />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
     </>
   );
 }
