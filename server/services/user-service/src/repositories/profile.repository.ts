@@ -45,6 +45,10 @@ class ProfileRepository {
     const result = await this.repository.delete({ authId: authId });
     return result.affected ? result.affected > 0 : false;
   }
+
+  async getAllUsers():Promise<Profile[] | null>{
+    return await this.repository.find();
+  }
 }
 
 export const profileRepository = new ProfileRepository();

@@ -20,6 +20,11 @@ export class UserController {
     ctx.body = user;
   }
 
+  async getAllUsers(ctx: Context) {
+    const users = await profileRepository.getAllUsers();
+    ctx.body = users;
+  }
+
   async updateUserById(ctx: Context) {
     ctx.body = { message: "Update user by id endpoint (stub)" };
   }
