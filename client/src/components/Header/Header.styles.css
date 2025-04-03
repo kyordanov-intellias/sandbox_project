@@ -1,9 +1,10 @@
+/* General header styles */
 .header {
   background-color: var(--color-primary-dark);
   padding: 1rem 0;
-  /* position: fixed; */
+  position: fixed;
   width: 100%;
-  /* top: 0; */
+  top: 0;
   z-index: 1000;
 }
 
@@ -13,12 +14,14 @@
   align-items: center;
 }
 
+/* Navigation links container */
 .nav-links {
   display: flex;
   gap: 2rem;
   align-items: center;
 }
 
+/* General nav link styling */
 .nav-link {
   color: var(--color-light);
   text-decoration: none;
@@ -33,6 +36,7 @@
   color: var(--color-accent);
 }
 
+/* Join and logout buttons styling */
 .join-button,
 .logout-button {
   background-color: var(--color-secondary);
@@ -47,4 +51,71 @@
 
 .join-button:hover {
   background-color: var(--color-accent);
+}
+
+/* Search input and dropdown */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  padding: 8px;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 4px;
+  width: 250px;
+  font-size: 14px;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%; /* Places dropdown right below input */
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.search-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-dropdown li:hover {
+  background-color: var(--color-light-gray);
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Avatar styles */
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.search-input:focus {
+  outline: none;
 }
