@@ -20,6 +20,22 @@ export class UserController {
     ctx.body = user;
   }
 
+  async searchUsers(ctx: Context) {
+    const query = ctx.query.query ? String(ctx.query.query) : "";
+  
+    if (!query.trim()) {
+      ctx.status = 400;
+      ctx.body = { message: "Query parameter is required" };
+      return;
+    }
+  
+    const safeLimit = Number(ctx.query.limit) > 0 ? Number(ctx.query.limit) : 10;
+    const safeOffset = Number(ctx.query.offset) >= 0 ? Number(ctx.query.offset) : 0;
+  
+    const users = await profileRepository.searchUsers(query, safeLimit, safeOffset);
+    ctx.body = users;
+  }
+
   async updateUserById(ctx: Context) {
     //TODO update users by id
     ctx.body = { message: "Update user by id endpoint (stub)" };
