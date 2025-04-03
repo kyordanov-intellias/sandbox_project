@@ -381,7 +381,6 @@
 }
 
 @media (max-width: 768px) {
-
   .skills-container,
   .contacts-container {
     align-items: flex-start !important;
@@ -406,4 +405,28 @@
   .contact-item {
     font-size: 0.85rem;
   }
+}
+
+.follow-button {
+  background-color: #5483b3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.follow-button:hover {
+  background-color: #406a91;
+}
+
+.follow-button.following {
+  background-color: #ff6b6b;
+}
+
+.follow-button.following:hover {
+  background-color: #e05858;
 }

@@ -234,9 +234,7 @@ const Register: React.FC = () => {
               </label>
               {formData.profileImage !== DEFAULT_IMAGES.profile && (
                 <>
-                  <div className="register__selected-file">
-                    Image selected
-                  </div>
+                  <div className="register__selected-file">Image selected</div>
                   <div className="register__image-preview">
                     <img src={formData.profileImage} alt="Profile preview" />
                   </div>
@@ -265,9 +263,7 @@ const Register: React.FC = () => {
               </label>
               {formData.coverImage !== DEFAULT_IMAGES.cover && (
                 <>
-                  <div className="register__selected-file">
-                    Image selected
-                  </div>
+                  <div className="register__selected-file">Image selected</div>
                   <div className="register__image-preview register__image-preview--cover">
                     <img src={formData.coverImage} alt="Cover preview" />
                   </div>
@@ -276,9 +272,7 @@ const Register: React.FC = () => {
               {uploadingCover && (
                 <div className="upload-status">Uploading...</div>
               )}
-              {coverError && (
-                <div className="error-message">{coverError}</div>
-              )}
+              {coverError && <div className="error-message">{coverError}</div>}
             </div>
           </div>
         </div>
@@ -393,22 +387,33 @@ const Register: React.FC = () => {
               />
               <select
                 value={skill.proficiencyLevel}
-                onChange={(e) => updateSkill(index, "proficiencyLevel", e.target.value)}
+                onChange={(e) =>
+                  updateSkill(index, "proficiencyLevel", e.target.value)
+                }
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
                 <option value="expert">Expert</option>
               </select>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="register__remove-btn"
                 onClick={() => removeSkill(index)}
               >
                 <X size={16} />
               </button>
+              {(!skill.name || errors[`skills.${index}.name`]) && (
+                <div className="error-message">
+                  {errors[`skills.${index}.name`] || "Skill name is required"}
+                </div>
+              )}
             </div>
           ))}
-          <button type="button" className="register__add-btn" onClick={addSkill}>
+          <button
+            type="button"
+            className="register__add-btn"
+            onClick={addSkill}
+          >
             <Plus size={16} /> Add Skill
           </button>
         </div>
@@ -417,7 +422,10 @@ const Register: React.FC = () => {
         <div className="register__form-section">
           <h3 className="register__form-section-title">Contacts</h3>
           {formData.contacts.map((contact, index) => (
-            <div key={index} className="register__input-row register__input-row--contact">
+            <div
+              key={index}
+              className="register__input-row register__input-row--contact"
+            >
               <select
                 value={contact.type}
                 onChange={(e) => updateContact(index, "type", e.target.value)}
@@ -437,20 +445,32 @@ const Register: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={contact.isPrimary}
-                  onChange={(e) => updateContact(index, "isPrimary", e.target.checked)}
+                  onChange={(e) =>
+                    updateContact(index, "isPrimary", e.target.checked)
+                  }
                 />
                 Primary
               </label>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="register__remove-btn"
                 onClick={() => removeContact(index)}
               >
                 <X size={16} />
               </button>
+              {(!contact.value || errors[`contacts.${index}.value`]) && (
+                <div className="error-message">
+                  {errors[`contacts.${index}.value`] ||
+                    "Contact value is required"}
+                </div>
+              )}
             </div>
           ))}
-          <button type="button" className="register__add-btn" onClick={addContact}>
+          <button
+            type="button"
+            className="register__add-btn"
+            onClick={addContact}
+          >
             <Plus size={16} /> Add Contact
           </button>
         </div>
