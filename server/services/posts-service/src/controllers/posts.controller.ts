@@ -1,6 +1,7 @@
 import { Context, ParameterizedContext } from "koa";
 import { postRepository } from "../repositories/posts.repository";
 import { likeRepository } from "../repositories/like.repository";
+import { Post } from "../models/Post.entity";
 
 export interface CreatePostRequest {
   content: string;
@@ -50,9 +51,9 @@ class PostsController {
   }
 
   async getPost(ctx: Context) {
-    const { id } = ctx.params;
+    const { postId } = ctx.params;
     try {
-      const post = await postRepository.findById(id);
+      const post = await postRepository.findById(postId);
       if (!post) {
         ctx.status = 404;
         ctx.body = { error: "Post not found" };
@@ -75,14 +76,18 @@ class PostsController {
 
       if (userId) {
         const likes = await likeRepository.findByUserId(userId as string);
-        const likedPostIds = likes.map(like => like.postId);
+        const likedPostIds = likes.map((like) => like.postId);
 
-        ctx.body = posts.map(post => ({
+        ctx.body = posts.map((post) => ({
           ...post,
-          isLikedByUser: likedPostIds.includes(post.id)
+          isLikedByUser: likedPostIds.includes(post.id),
+          isMarkedVByAdmin: post.isMarkedByAdmin,
         }));
       } else {
-        ctx.body = posts;
+        ctx.body = posts.map((post) => ({
+          ...post,
+          isMarkedVByAdmin: post.isMarkedByAdmin,
+        }));
       }
     } catch (error) {
       ctx.status = 500;
@@ -101,7 +106,10 @@ class PostsController {
     }
 
     try {
-      const existingLike = await likeRepository.findByPostAndUser(id, userId as string);
+      const existingLike = await likeRepository.findByPostAndUser(
+        id,
+        userId as string
+      );
 
       if (existingLike) {
         ctx.status = 400;
@@ -120,13 +128,13 @@ class PostsController {
       const postWithLikes = await postRepository.findById(id);
       ctx.body = {
         ...postWithLikes,
-        isLikedByUser: true
+        isLikedByUser: true,
       };
     } catch (error) {
       ctx.status = 500;
       ctx.body = {
         error: "Error liking post",
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -142,7 +150,10 @@ class PostsController {
     }
 
     try {
-      const existingLike = await likeRepository.findByPostAndUser(id, userId as string);
+      const existingLike = await likeRepository.findByPostAndUser(
+        id,
+        userId as string
+      );
       if (!existingLike) {
         ctx.status = 400;
         ctx.body = { error: "Post not liked by user" };
@@ -161,11 +172,78 @@ class PostsController {
       const postWithLikes = await postRepository.findById(id);
       ctx.body = {
         ...postWithLikes,
-        isLikedByUser: false
+        isLikedByUser: false,
       };
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: "Error unliking post" };
+    }
+  }
+
+  async toggleMarkByAdmin(ctx: Context) {
+    try {
+      const postId = ctx.params.postId;
+      const post = await postRepository.findById(postId);
+
+      if (!post) {
+        ctx.status = 404;
+        ctx.body = { error: "Post not found" };
+        return;
+      }
+
+      post.isMarkedByAdmin = !post.isMarkedByAdmin;
+      const updatedPost = await postRepository.save(post);
+
+      ctx.body = updatedPost;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: "Failed to toggle marked status" };
+    }
+  }
+
+  async updatePost(ctx: Context) {
+    const { postId } = ctx.params;
+    const updates = ctx.request.body as Partial<Post>;;
+
+    try {
+      const updatedPost = await postRepository.update(postId, updates);
+
+      if (!updatedPost) {
+        ctx.status = 404;
+        ctx.body = { message: `Post with id ${postId} not found.` };
+        return;
+      }
+
+      ctx.body = updatedPost;
+    } catch (error) {
+      console.error("Error updating post:", error);
+      ctx.status = 500;
+      ctx.body = { message: "Failed to update post" };
+    }
+  }
+
+  async deletePost(ctx: Context) {
+    const { postId } = ctx.params;
+
+    try {
+      const success = await postRepository.delete(postId);
+
+      if (!success) {
+        ctx.status = 404;
+        ctx.body = { message: `Post with id ${postId} not found` };
+        return;
+      }
+
+      ctx.status = 200;
+      ctx.body = {
+        message: `Post with id ${postId} has been deleted`,
+      };
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      ctx.status = 500;
+      ctx.body = {
+        message: "An error occurred while deleting the post",
+      };
     }
   }
 }
