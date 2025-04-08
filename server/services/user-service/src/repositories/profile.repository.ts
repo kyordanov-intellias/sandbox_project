@@ -45,7 +45,11 @@ class ProfileRepository {
     return result.affected ? result.affected > 0 : false;
   }
 
-  async searchUsers(query: string, limit: number = 10, offset: number = 0): Promise<Profile[]> {
+  async searchUsers(
+    query: string,
+    limit: number = 10,
+    offset: number = 0
+  ): Promise<Profile[]> {
     return await this.repository.find({
       where: [
         { firstName: ILike(`%${query}%`) },
@@ -53,7 +57,7 @@ class ProfileRepository {
       ],
       take: limit,
       skip: offset,
-      select: ["id", "firstName", "lastName", "profileImage"],
+      select: ["id", "firstName", "lastName", "profileImage", "authId"],
     });
   }
 }
