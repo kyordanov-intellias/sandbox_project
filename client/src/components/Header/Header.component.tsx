@@ -4,19 +4,12 @@ import { Home, MessageSquare, ShieldUser, BookUser } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import debounce from "lodash/debounce";
 import "./Header.styles.css";
+import { SearchProfile } from "../../interfaces/userInterfaces";
 
 const Header: FC = () => {
   const { user, logout } = useUser();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<
-    {
-      id: string;
-      authId: string;
-      profileImage: string;
-      firstName: string;
-      lastName: string;
-    }[]
-  >([]);
+  const [results, setResults] = useState<SearchProfile[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [loading, setLoading] = useState(false);

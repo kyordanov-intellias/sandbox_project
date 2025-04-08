@@ -11,14 +11,6 @@ export interface UpdateUserInterface {
   userRole?: string;
 }
 
-export interface UserInterface {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-}
-
 export interface User {
   id: string;
   email: string;
@@ -35,11 +27,11 @@ export interface User {
     coverImage?: string;
     skills: Array<{
       id: string;
-      proficiencyLevel:string;
-      skill:{
+      proficiencyLevel: string;
+      skill: {
         id: string;
         name: string;
-      }
+      };
     }>;
     contacts: Array<{
       id: string;
@@ -81,7 +73,6 @@ export interface RegisterForm {
   coverImage: string;
 }
 
-
 export interface UserProfileInterface {
   id: string;
   authId: string;
@@ -105,4 +96,12 @@ export interface UserProfileInterface {
     value: string;
     isPrimary: boolean;
   }[];
+}
+
+export interface SearchProfile {
+  id: string;
+  authId: string;
+  profileImage: string;
+  firstName: string;
+  lastName: string;
 }
