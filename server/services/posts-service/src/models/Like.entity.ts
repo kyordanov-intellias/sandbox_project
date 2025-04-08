@@ -21,7 +21,9 @@ export class Like {
     @Column("uuid", { name: "post_id" })
     postId!: string;
 
-    @ManyToOne(() => Post, post => post.likesCount)
+    @ManyToOne(() => Post, post => post.likesCount, {
+        onDelete:"CASCADE"
+    })
     @JoinColumn({ name: "post_id" })
     post!: Post;
 
