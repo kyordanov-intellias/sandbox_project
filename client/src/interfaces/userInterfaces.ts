@@ -24,6 +24,7 @@ export interface User {
   email: string;
   userRole: string;
   createdAt: Date;
+  authId: string;
   profile?: {
     authId?: string;
     email: string;
@@ -35,11 +36,11 @@ export interface User {
     coverImage?: string;
     skills: Array<{
       id: string;
-      proficiencyLevel:string;
-      skill:{
+      proficiencyLevel: string;
+      skill: {
         id: string;
         name: string;
-      }
+      };
     }>;
     contacts: Array<{
       id: string;
@@ -80,7 +81,6 @@ export interface RegisterForm {
   profileImage: string;
   coverImage: string;
 }
-
 
 export interface UserProfileInterface {
   id: string;

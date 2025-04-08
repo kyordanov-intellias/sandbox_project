@@ -25,7 +25,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const profileResponse = await getUserById(authData.id);
         const profileData = await profileResponse.json();
-        console.log(profileData);
 
         setUser({
           ...authData,
