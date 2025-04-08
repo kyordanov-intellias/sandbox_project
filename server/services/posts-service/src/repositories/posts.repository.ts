@@ -1,9 +1,12 @@
 import { AppDataSource } from "../db/data-source";
 import { Post } from "../models/Post.entity";
-import { Comment } from "../models/Comment.entity";
 
 class PostRepository {
   private repository = AppDataSource.getRepository(Post);
+
+  async save(post: Post): Promise<Post> {
+    return this.repository.save(post);
+  }
 
   async create(postData: {
     authorId: string;
@@ -56,9 +59,19 @@ class PostRepository {
       .set({ likesCount: () => "GREATEST(likes_count - 1, 0)" })
       .where("id = :id", { id })
       .execute();
-  
+
     return this.findById(id);
   }
+
+  async update(id: string, updates: Partial<Post>): Promise<Post | null> {
+    const post = await this.repository.findOne({ where: { id } });
+  
+    if (!post) return null;
+  
+    const updatedPost = this.repository.merge(post, updates);
+    return await this.repository.save(updatedPost);
+  }
+  
 
   async delete(id: string): Promise<boolean> {
     const result = await this.repository.delete(id);
