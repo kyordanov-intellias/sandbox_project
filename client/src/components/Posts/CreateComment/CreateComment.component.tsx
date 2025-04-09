@@ -13,6 +13,7 @@ export function CreateComment({ post, onCommentCreated }: CreateCommentProps) {
   const { user } = useUser();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!user) {
     return <div className="login-prompt">Please log in to comment</div>;
@@ -22,6 +23,7 @@ export function CreateComment({ post, onCommentCreated }: CreateCommentProps) {
     e.preventDefault();
     if (!content.trim()) return;
 
+    setError(null); 
     try {
       setIsSubmitting(true);
       const response = await commentPost(content, post, user);
@@ -31,7 +33,7 @@ export function CreateComment({ post, onCommentCreated }: CreateCommentProps) {
       setContent("");
       onCommentCreated();
     } catch (error) {
-      console.error("Error creating comment:", error);
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -45,13 +47,19 @@ export function CreateComment({ post, onCommentCreated }: CreateCommentProps) {
           alt={`${user.profile?.firstName}'s avatar`}
           className="comment-avatar"
         />
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Write a comment..."
-          className="comment-textarea"
-          rows={2}
-        />
+        <div className="comment-textarea-wrapper">
+          <textarea
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="Write a comment..."
+            className="comment-textarea"
+            rows={2}
+          />
+          {error && <div className="comment-error">{error}</div>}
+        </div>
       </div>
       <div className="comment-button-container">
         <button
