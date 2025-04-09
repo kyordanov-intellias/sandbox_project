@@ -16,7 +16,8 @@ export interface Post {
   createdAt: Date;
   updatedAt: Date;
   comments: Comment[];
-  isLikedByUser: boolean;
+  isLikedByUser?: boolean;
+  isMarkedByAdmin?: boolean;
 }
 
 export interface Comment {
@@ -39,5 +40,4 @@ export interface CreatePostRequest {
     profileImage: string;
     userRole: string;
   };
-};
-
+}

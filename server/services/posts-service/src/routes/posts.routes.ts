@@ -15,13 +15,22 @@ router.get("/health", async (ctx: Context) => {
 
 router.post("/", validateToken, postsController.createPost);
 router.get("/", postsController.getAllPosts);
-router.get("/:id", postsController.getPost);
+router.get("/:postId", postsController.getPost);
+router.patch("/edit/:postId", postsController.updatePost);
+router.delete("/:postId", validateToken, postsController.deletePost);
+
+router.put("/:postId/mark", validateToken, postsController.toggleMarkByAdmin);
+
 router.post("/:id/like", validateToken, postsController.likePost);
-router.post("/:id/dislike", validateToken,postsController.dislikePost);
-//TODO make repost fn -> like the likes
+router.post("/:id/dislike", validateToken, postsController.dislikePost);
+
 router.get("/:postId/comments", commentsController.getPostComments);
-router.post("/:postId/comments", validateToken, commentsController.createComment);
-router.put("/comments/:id",validateToken, commentsController.updateComment);
+router.post(
+  "/:postId/comments",
+  validateToken,
+  commentsController.createComment
+);
+router.put("/comments/:id", validateToken, commentsController.updateComment);
 router.delete("/comments/:id", validateToken, commentsController.deleteComment);
 
 export { router as postsRouter };

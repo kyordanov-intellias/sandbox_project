@@ -16,6 +16,7 @@ export interface User {
   email: string;
   userRole: string;
   createdAt: Date;
+  authId: string;
   profile?: {
     authId?: string;
     email: string;
