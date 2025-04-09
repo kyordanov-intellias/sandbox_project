@@ -12,4 +12,8 @@ export const configUserFile = {
     password: process.env.USER_SERVICE_DB_PASSWORD || "postgres",
     database: process.env.USER_SERVICE_DB_NAME || "user_db",
   },
+  redis: {
+    host: process.env.REDIS_HOST || "redis",
+    port: parseInt(process.env.REDIS_PORT || "6379"),
+  },
 };
