@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Heart, MessageCircle, Repeat2, Flag } from "lucide-react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import { Post } from "../../../interfaces/postsInterfaces";
 import { PostModal } from "../PostModal/PostModal.component";
 import { useUser } from "../../../context/UserContext";
 import { deletePost, markPost } from "../../../services/postService";
-import Swal from "sweetalert2";
+import { PostActions } from "./PostActions.component";
 import "./PostCard.styles.css";
 
 interface PostCardProps {
@@ -151,46 +151,12 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
             />
           )}
 
-          <div className="post-card-actions">
-            <button
-              className={`post-card-action-button ${
-                post.isLikedByUser ? "liked" : ""
-              }`}
-              onClick={handleLike}
-              disabled={!user || isLiking}
-            >
-              <Heart
-                size={20}
-                className={
-                  post.isLikedByUser ? "heart-icon liked" : "heart-icon"
-                }
-                fill={post.isLikedByUser ? "currentColor" : "none"}
-              />
-              <span>{post.likesCount}</span>
-            </button>
-
-            <button className="post-card-action-button comment-button">
-              <MessageCircle size={20} />
-              <span>{post.comments.length}</span>
-            </button>
-
-            <button className="post-card-action-button repost-button">
-              <Repeat2 size={20} />
-              <span>{post.repostsCount}</span>
-            </button>
-
-            {user?.userRole === "administrator" && (
-              <button
-                className={`post-card-action-button ${
-                  post.isMarkedByAdmin ? "marked" : ""
-                }`}
-                onClick={handleMark}
-              >
-                <Flag size={20} />
-                <span>{post.isMarkedByAdmin ? "Marked" : "Mark"}</span>
-              </button>
-            )}
-          </div>
+          <PostActions
+            post={post}
+            isLiking={isLiking}
+            onLike={handleLike}
+            onMark={handleMark}
+          />
         </div>
 
         {isModalOpen && (
