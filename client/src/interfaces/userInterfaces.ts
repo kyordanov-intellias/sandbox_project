@@ -98,10 +98,7 @@ export interface UserProfileInterface {
   }[];
 }
 
-export interface SearchProfile {
-  id: string;
-  authId: string;
-  profileImage: string;
-  firstName: string;
-  lastName: string;
-}
+export type SearchProfile = Pick<
+  UserProfileInterface,
+  "id" | "authId" | "profileImage" | "firstName" | "lastName"
+>;

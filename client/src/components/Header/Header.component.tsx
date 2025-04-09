@@ -6,6 +6,13 @@ import debounce from "lodash/debounce";
 import "./Header.styles.css";
 import { SearchProfile } from "../../interfaces/userInterfaces";
 
+const CACHE_TTL = 60 * 1000;
+
+type CachedEntry = {
+  timestamp: number;
+  data: SearchProfile[];
+};
+
 const Header: FC = () => {
   const { user, logout } = useUser();
   const [query, setQuery] = useState("");
@@ -13,7 +20,7 @@ const Header: FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [loading, setLoading] = useState(false);
-  const searchCache = useRef<Map<string, SearchProfile[]>>(new Map());
+  const searchCache = useRef<Map<string, CachedEntry>>(new Map());
 
   const debouncedSearch = debounce((query: string) => {
     if (query.length === 0) {
@@ -22,10 +29,15 @@ const Header: FC = () => {
       return;
     }
 
-    if (searchCache.current.has(query)) {
-      setResults(searchCache.current.get(query)!);
+    const cached = searchCache.current.get(query);
+    const isCacheValid = cached && Date.now() - cached.timestamp < CACHE_TTL;
+
+    if (cached && isCacheValid) {
+      setResults(cached.data);
       setShowDropdown(true);
       return;
+    } else if (cached && !isCacheValid) {
+      searchCache.current.delete(query);
     }
 
     setLoading(true);
@@ -33,7 +45,10 @@ const Header: FC = () => {
     fetch(`http://localhost:4000/users/search?query=${query}&limit=5`)
       .then((res) => res.json())
       .then((data) => {
-        searchCache.current.set(query, data);
+        searchCache.current.set(query, {
+          timestamp: Date.now(),
+          data,
+        });
         setResults(data);
         setShowDropdown(true);
       })
@@ -48,7 +63,6 @@ const Header: FC = () => {
 
   useEffect(() => {
     debouncedSearch(query);
-
     return () => {
       debouncedSearch.cancel();
     };
@@ -136,7 +150,6 @@ const Header: FC = () => {
                   alt="user-profile-img"
                 />
               </Link>
-
               <button className="logout-button" onClick={logout}>
                 Log out
               </button>

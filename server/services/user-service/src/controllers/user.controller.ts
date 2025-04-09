@@ -23,20 +23,27 @@ export class UserController {
   }
 
   async searchUsers(ctx: Context) {
-    const query = ctx.query.query ? String(ctx.query.query) : "";
-
-    if (!query.trim()) {
+    const query = ctx.query.query ? String(ctx.query.query).trim() : "";
+  
+    if (!query) {
       ctx.status = 400;
       ctx.body = { message: "Query parameter is required" };
       return;
     }
-
-    const safeLimit =
-      Number(ctx.query.limit) > 0 ? Number(ctx.query.limit) : 10;
-    const safeOffset =
-      Number(ctx.query.offset) >= 0 ? Number(ctx.query.offset) : 0;
-
-    const cacheKey = `search:${query}:${ctx.query.limit}:${ctx.query.offset}`;
+  
+    const parseNumber = (value: any): number | null => {
+      const parsed = Number(value);
+      return isNaN(parsed) ? null : parsed;
+    };
+  
+    const rawLimit = parseNumber(ctx.query.limit);
+    const rawOffset = parseNumber(ctx.query.offset);
+  
+    const safeLimit = rawLimit && rawLimit > 0 && rawLimit <= 50 ? rawLimit : 10;
+    const safeOffset = rawOffset && rawOffset >= 0 ? rawOffset : 0;
+  
+    const cacheKey = `search:${query}:${safeLimit}:${safeOffset}`;
+  
     try {
       const cached = await redisClient.get(cacheKey);
       if (cached) {
@@ -48,7 +55,8 @@ export class UserController {
         safeLimit,
         safeOffset
       );
-      await redisClient.set(cacheKey, JSON.stringify(users), "EX", 60);
+  
+      await redisClient.set(cacheKey, JSON.stringify(users), "EX", 60); // 60s cache
       ctx.body = users;
     } catch (error) {
       console.error("Error in searchUsers:", error);
@@ -56,6 +64,7 @@ export class UserController {
       ctx.body = { message: "Internal server error" };
     }
   }
+  
 
   async updateUserById(ctx: Context) {
     //TODO update users by id
