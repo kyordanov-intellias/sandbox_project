@@ -11,14 +11,6 @@ export interface UpdateUserInterface {
   userRole?: string;
 }
 
-export interface UserInterface {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-}
-
 export interface User {
   id: string;
   email: string;
@@ -106,3 +98,8 @@ export interface UserProfileInterface {
     isPrimary: boolean;
   }[];
 }
+
+export type SearchProfile = Pick<
+  UserProfileInterface,
+  "id" | "authId" | "profileImage" | "firstName" | "lastName"
+>;

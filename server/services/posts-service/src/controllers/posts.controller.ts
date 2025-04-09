@@ -97,34 +97,32 @@ class PostsController {
 
   async likePost(ctx: Context) {
     const { id } = ctx.params;
-    const { userId } = ctx.query;
-
-    if (!userId) {
+    const userId = ctx.query.userId;
+  
+    if (typeof userId !== "string" || !userId.trim()) {
       ctx.status = 400;
-      ctx.body = { error: "UserId is required" };
+      ctx.body = { error: "Valid userId is required" };
       return;
     }
-
+  
     try {
-      const existingLike = await likeRepository.findByPostAndUser(
-        id,
-        userId as string
-      );
-
+      const existingLike = await likeRepository.findByPostAndUser(id, userId);
+  
       if (existingLike) {
         ctx.status = 400;
         ctx.body = { error: "Post already liked by user" };
         return;
       }
-      await likeRepository.create(id, userId as string);
+  
+      await likeRepository.create(id, userId);
       const post = await postRepository.incrementLikes(id);
-
+  
       if (!post) {
         ctx.status = 404;
         ctx.body = { error: "Post not found" };
         return;
       }
-
+  
       const postWithLikes = await postRepository.findById(id);
       ctx.body = {
         ...postWithLikes,
@@ -138,37 +136,36 @@ class PostsController {
       };
     }
   }
+  
 
   async dislikePost(ctx: Context) {
     const { id } = ctx.params;
-    const { userId } = ctx.query;
-
-    if (!userId) {
+    const userId = ctx.query.userId;
+  
+    if (typeof userId !== "string" || !userId.trim()) {
       ctx.status = 400;
-      ctx.body = { error: "UserId is required" };
+      ctx.body = { error: "Valid userId is required" };
       return;
     }
-
+  
     try {
-      const existingLike = await likeRepository.findByPostAndUser(
-        id,
-        userId as string
-      );
+      const existingLike = await likeRepository.findByPostAndUser(id, userId);
+  
       if (!existingLike) {
         ctx.status = 400;
         ctx.body = { error: "Post not liked by user" };
         return;
       }
-
-      await likeRepository.delete(id, userId as string);
+  
+      await likeRepository.delete(id, userId);
       const post = await postRepository.decrementLikes(id);
-
+  
       if (!post) {
         ctx.status = 404;
         ctx.body = { error: "Post not found" };
         return;
       }
-
+  
       const postWithLikes = await postRepository.findById(id);
       ctx.body = {
         ...postWithLikes,
@@ -176,7 +173,10 @@ class PostsController {
       };
     } catch (error) {
       ctx.status = 500;
-      ctx.body = { error: "Error unliking post" };
+      ctx.body = {
+        error: "Error unliking post",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -203,7 +203,7 @@ class PostsController {
 
   async updatePost(ctx: Context) {
     const { postId } = ctx.params;
-    const updates = ctx.request.body as Partial<Post>;
+    const updates = ctx.request.body as Partial<Post>;;
 
     try {
       const updatedPost = await postRepository.update(postId, updates);
