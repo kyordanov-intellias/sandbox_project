@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Home, MessageSquare, ShieldUser, BookUser } from "lucide-react";
 import { useUser } from "../../context/UserContext";
@@ -13,6 +13,7 @@ const Header: FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [loading, setLoading] = useState(false);
+  const searchCache = useRef<Map<string, SearchProfile[]>>(new Map());
 
   const debouncedSearch = debounce((query: string) => {
     if (query.length === 0) {
@@ -21,11 +22,18 @@ const Header: FC = () => {
       return;
     }
 
+    if (searchCache.current.has(query)) {
+      setResults(searchCache.current.get(query)!);
+      setShowDropdown(true);
+      return;
+    }
+
     setLoading(true);
-    
+
     fetch(`http://localhost:4000/users/search?query=${query}&limit=5`)
       .then((res) => res.json())
       .then((data) => {
+        searchCache.current.set(query, data);
         setResults(data);
         setShowDropdown(true);
       })
