@@ -4,9 +4,10 @@ import Swal from "sweetalert2";
 import { Post } from "../../../interfaces/postsInterfaces";
 import { PostModal } from "../PostModal/PostModal.component";
 import { useUser } from "../../../context/UserContext";
-import { deletePost, markPost } from "../../../services/postService";
+import { deletePost, markPost, likePost } from "../../../services/postService";
 import { PostActions } from "./PostActions.component";
 import "./PostCard.styles.css";
+import { EditPost } from "../EditPost/EditPost.component";
 
 interface PostCardProps {
   post: Post;
@@ -16,7 +17,8 @@ interface PostCardProps {
 
 export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
   const { user } = useUser();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
@@ -26,14 +28,7 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
 
     try {
       setIsLiking(true);
-      const action = post.isLikedByUser ? "dislike" : "like";
-      const response = await fetch(
-        `http://localhost:4000/posts/${post.id}/${action}?userId=${user.id}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const response = await likePost(post.id, user.id, post.isLikedByUser ?? false);
 
       if (!response.ok) {
         throw new Error("Failed to update like status");
@@ -89,7 +84,7 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
   return (
     <>
       <div className="post-card-wrapper">
-        <div className="post-card" onClick={() => setIsModalOpen(true)}>
+        <div className="post-card" onClick={() => setIsPostModalOpen(true)}>
           <div className="post-card-author">
             <img
               src={post.authorInfo.profileImage}
@@ -121,7 +116,7 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
                   <button
                     className="post-options-item"
                     onClick={() => {
-                      setIsModalOpen(true);
+                      setIsEditModalOpen(true);
                       setShowOptions(false);
                     }}
                   >
@@ -159,10 +154,18 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
           />
         </div>
 
-        {isModalOpen && (
+        {isPostModalOpen && (
           <PostModal
             post={post}
-            onClose={() => setIsModalOpen(false)}
+            onClose={() => setIsPostModalOpen(false)}
+            fetchPosts={fetchPosts}
+          />
+        )}
+
+        {isEditModalOpen && (
+          <EditPost
+            post={post}
+            onClose={() => setIsEditModalOpen(false)}
             fetchPosts={fetchPosts}
           />
         )}
