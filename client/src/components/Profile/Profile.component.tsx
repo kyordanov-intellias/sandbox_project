@@ -76,6 +76,10 @@ export default function Profile() {
     if (profileId) {
       fetchProfile();
     }
+
+    if (!isOwnProfile) {
+      setActiveSection("reposted");
+    }
   }, [profileId, currentUser, isOwnProfile]);
 
   const handleEditProfile = (formData: EditFormData) => {
@@ -92,34 +96,20 @@ export default function Profile() {
   const likedPosts: Array<{id: string; title: string; content: string; createdAt: string}> = [];
   const repostedPosts: Array<{id: string; title: string; content: string; createdAt: string}> = [];
 
-  if (loading) {
-    return <div className="loading">Loading profile...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-
-  if (!profile) {
-    return <div className="error">Profile not found</div>;
-  }
+  if (loading) return <div className="loading">Loading profile...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!profile) return <div className="error">Profile not found</div>;
 
   return (
     <div className="profile-container">
       <div className="profile-cover">
-        <img
-          src={profile.coverImage || DEFAULT_IMAGES.cover}
-          alt="Cover"
-        />
+        <img src={profile.coverImage || DEFAULT_IMAGES.cover} alt="Cover" />
       </div>
 
       <div className="profile-content">
         <div className="profile-header">
           <div className="profile-picture">
-            <img
-              src={profile.profileImage || DEFAULT_IMAGES.profile}
-              alt="Profile"
-            />
+            <img src={profile.profileImage || DEFAULT_IMAGES.profile} alt="Profile" />
           </div>
           <div className="profile-info">
             <div className="name-section">
@@ -212,7 +202,7 @@ export default function Profile() {
             <div className="detail-item contacts-container">
               <strong>Contacts:</strong>
               <div className="contacts-list">
-                {profile.contacts && profile.contacts.length > 0 ? (
+                {profile.contacts?.length ? (
                   profile.contacts.map((contact, index) => (
                     <span key={index} className="contact-item">
                       {contact.value}
@@ -226,9 +216,9 @@ export default function Profile() {
           </div>
         </div>
 
-        {isOwnProfile && (
-          <>
-            <div className="posts-navigation">
+        <div className="posts-navigation">
+          {isOwnProfile ? (
+            <>
               <button
                 className={`posts-nav-button ${
                   activeSection === "liked" ? "active" : ""
@@ -247,58 +237,62 @@ export default function Profile() {
                 <Repeat size={20} />
                 Reposted
               </button>
-            </div>
-
-            <div
-              className={`posts-section ${
-                activeSection === "liked" ? "active" : ""
-              }`}
+            </>
+          ) : (
+            <button
+              className="posts-nav-button active"
+              onClick={() => setActiveSection("reposted")}
             >
-              {likedPosts.length > 0 ? (
-                <div className="profile-posts">
-                  {likedPosts.map((post) => (
-                    <div key={post.id} className="post-card">
-                      <h3>{post.title}</h3>
-                      <p>{post.content}</p>
-                      <span className="post-date">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-posts">
-                  <HeartOff size={48} />
-                  <p>No liked posts yet</p>
-                </div>
-              )}
-            </div>
+              <Repeat size={20} />
+              Reposted
+            </button>
+          )}
+        </div>
 
-            <div
-              className={`posts-section ${
-                activeSection === "reposted" ? "active" : ""
-              }`}
-            >
-              {repostedPosts.length > 0 ? (
-                <div className="profile-posts">
-                  {repostedPosts.map((post) => (
-                    <div key={post.id} className="post-card">
-                      <h3>{post.title}</h3>
-                      <p>{post.content}</p>
-                      <span className="post-date">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-posts">
-                  <RepeatOff size={48} />
-                  <p>No reposted posts yet</p>
-                </div>
-              )}
-            </div>
-          </>
+        {activeSection === "liked" && isOwnProfile && (
+          <div className="posts-section active">
+            {likedPosts.length > 0 ? (
+              <div className="profile-posts">
+                {likedPosts.map((post) => (
+                  <div key={post.id} className="post-card">
+                    <h3>{post.title}</h3>
+                    <p>{post.content}</p>
+                    <span className="post-date">
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-posts">
+                <HeartOff size={48} />
+                <p>No liked posts yet</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeSection === "reposted" && (
+          <div className="posts-section active">
+            {repostedPosts.length > 0 ? (
+              <div className="profile-posts">
+                {repostedPosts.map((post) => (
+                  <div key={post.id} className="post-card">
+                    <h3>{post.title}</h3>
+                    <p>{post.content}</p>
+                    <span className="post-date">
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-posts">
+                <RepeatOff size={48} />
+                <p>No reposted posts yet</p>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
