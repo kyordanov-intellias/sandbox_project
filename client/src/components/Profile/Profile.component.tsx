@@ -32,14 +32,14 @@ export default function Profile() {
   );
   const { user: currentUser } = useUser();
   const [isFollowing, setIsFollowing] = useState(false);
-  
+
   const isOwnProfile = currentUser?.id === profileId;
 
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         if (isOwnProfile && currentUser?.profile) {
           setProfile({
@@ -57,12 +57,12 @@ export default function Profile() {
           setLoading(false);
           return;
         }
-        
+
         const response = await getUserById(profileId || "");
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
         }
-        
+
         const profileData = await response.json();
         setProfile(profileData);
       } catch (err) {
@@ -154,8 +154,8 @@ export default function Profile() {
                     </div>
                   )}
                 </>
-              ) : (
-                <button 
+              ) : currentUser ? (
+                <button
                   className={`follow-button ${isFollowing ? 'following' : ''}`}
                   onClick={handleFollowToggle}
                 >
@@ -171,7 +171,7 @@ export default function Profile() {
                     </>
                   )}
                 </button>
-              )}
+              ) : null}
             </div>
             <span className="profile-role">
               {profile.userRole
@@ -199,7 +199,9 @@ export default function Profile() {
                   profile.skills.map((skill, index) => (
                     <span key={index} className="skill-tag">
                       <span className="skill-name">{skill.skill.name}</span>
-                      <span className="skill-level">{skill.proficiencyLevel}</span>
+                      <span className="skill-level">
+                        {skill.proficiencyLevel}
+                      </span>
                     </span>
                   ))
                 ) : (
@@ -315,4 +317,3 @@ export default function Profile() {
     </div>
   );
 }
-

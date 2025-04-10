@@ -27,15 +27,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/profile/:profileId"
-          // TODO -> in future you can search other users
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/profile/:profileId" element={<Profile />} />
         <Route
           path="/login"
           element={

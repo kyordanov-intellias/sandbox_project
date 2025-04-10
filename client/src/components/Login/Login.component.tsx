@@ -28,6 +28,7 @@ const Login: FC = () => {
     password: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,6 +39,7 @@ const Login: FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setLoading(true);
 
     try {
       loginSchema.parse(formData);
@@ -49,7 +51,7 @@ const Login: FC = () => {
         navigate("/");
       } else {
         setErrors({
-          server: data.error || "Login failed!"
+          server: data.error || "Login failed!",
         });
       }
     } catch (error) {
@@ -63,21 +65,22 @@ const Login: FC = () => {
         setErrors(newErrors);
       } else if (error instanceof Error) {
         const serverError = error as ApiError;
-        // TODO typeguard
         if (serverError.response?.data?.error) {
           setErrors({
-            server: serverError.response.data.error
+            server: serverError.response.data.error,
           });
         } else {
           setErrors({
-            server: serverError.message || 'An error occurred during login'
+            server: serverError.message || "An error occurred during login",
           });
         }
       } else {
         setErrors({
-          server: "An unexpected error occurred"
+          server: "An unexpected error occurred",
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,7 +93,7 @@ const Login: FC = () => {
           <button
             type="button"
             className="auth-toggle-button active"
-            onClick={() => { }}
+            onClick={() => {}}
           >
             Sign In
           </button>
@@ -131,17 +134,12 @@ const Login: FC = () => {
           )}
         </div>
 
-        <button type="submit" className="auth-submit">
-          Login
+        <button type="submit" className="auth-submit" disabled={loading}>
+          {loading ? <span className="register-loader"></span> : "Login"}
         </button>
 
-        {errors.server && (
-          <div className="error-message">
-            {errors.server}
-          </div>
-        )}
+        {errors.server && <div className="error-message">{errors.server}</div>}
       </form>
-
     </div>
   );
 };

@@ -55,6 +55,7 @@ const Register: React.FC = () => {
     profileImage: DEFAULT_IMAGES.profile,
     coverImage: DEFAULT_IMAGES.cover,
   });
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const {
     uploading: uploadingProfile,
@@ -168,6 +169,8 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       registerSchema.parse(formData);
       const response = await registerUser(formData);
@@ -179,8 +182,9 @@ const Register: React.FC = () => {
         setTimeout(() => {
           navigate("/login");
         }, 1000);
+        return;
       } else {
-        setErrors(data.error || "Registration failed!");
+        setErrors({ general: data.error || "Registration failed!" });
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -192,6 +196,8 @@ const Register: React.FC = () => {
         });
         setErrors(newErrors);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -475,8 +481,18 @@ const Register: React.FC = () => {
           </button>
         </div>
 
-        <button type="submit" className="auth-submit">
-          Create Account
+        {errors.general && (
+          <div className="error-message error-message--general">
+            {errors.general}
+          </div>
+        )}
+
+        <button type="submit" className="auth-submit" disabled={loading}>
+          {loading ? (
+            <span className="register-loader"></span>
+          ) : (
+            "Create Account"
+          )}
         </button>
       </form>
     </div>
