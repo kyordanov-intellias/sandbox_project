@@ -430,3 +430,25 @@
 .follow-button.following:hover {
   background-color: #e05858;
 }
+
+.profile-posts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .profile-posts {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    );
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-posts {
+    grid-template-columns: 1fr;
+  }
+}
