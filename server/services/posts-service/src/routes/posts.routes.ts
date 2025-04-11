@@ -24,6 +24,10 @@ router.put("/:postId/mark", validateToken, postsController.toggleMarkByAdmin);
 router.post("/:id/like", validateToken, postsController.likePost);
 router.post("/:id/dislike", validateToken, postsController.dislikePost);
 
+router.post("/:id/repost", validateToken, postsController.repostPost);
+router.post("/:id/unrepost", validateToken, postsController.unrepostPost);
+router.get("/reposted/:userId", postsController.getRepostedPostsByUser);
+
 router.get("/:postId/comments", commentsController.getPostComments);
 router.post(
   "/:postId/comments",

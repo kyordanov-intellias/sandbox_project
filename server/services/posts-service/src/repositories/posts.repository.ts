@@ -63,6 +63,28 @@ class PostRepository {
     return this.findById(id);
   }
 
+  async incrementReposts(id: string): Promise<Post | null> {
+    await this.repository
+      .createQueryBuilder()
+      .update(Post)
+      .set({ repostsCount: () => "reposts_count + 1" })
+      .where("id = :id", { id })
+      .execute();
+  
+    return this.findById(id);
+  }
+  
+  async decrementReposts(id: string): Promise<Post | null> {
+    await this.repository
+      .createQueryBuilder()
+      .update(Post)
+      .set({ repostsCount: () => "GREATEST(reposts_count - 1, 0)" })
+      .where("id = :id", { id })
+      .execute();
+  
+    return this.findById(id);
+  }
+
   async update(id: string, updates: Partial<Post>): Promise<Post | null> {
     const post = await this.repository.findOne({ where: { id } });
   
@@ -76,6 +98,15 @@ class PostRepository {
   async delete(id: string): Promise<boolean> {
     const result = await this.repository.delete(id);
     return result.affected ? result.affected > 0 : false;
+  }
+
+  async findByIds(ids: string[]): Promise<Post[]> {
+    return this.repository
+      .createQueryBuilder("post")
+      .leftJoinAndSelect("post.comments", "comments")
+      .where("post.id IN (:...ids)", { ids })
+      .orderBy("post.created_at", "DESC")
+      .getMany();
   }
 }
 
