@@ -19,6 +19,8 @@ import { EditFormData } from "../../interfaces/userInterfaces";
 import { DEFAULT_IMAGES } from "../Register/defaultImages";
 import { getUserById } from "../../services/userServices";
 import { UserProfileInterface } from "../../interfaces/userInterfaces";
+import { Post } from "../../interfaces/postsInterfaces";
+import { PostCard } from "../Posts/PostCard/PostCard.components";
 
 export default function Profile() {
   const { profileId } = useParams<{ profileId: string }>();
@@ -32,6 +34,8 @@ export default function Profile() {
   );
   const { user: currentUser } = useUser();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const [repostedPosts, setRepostedPosts] = useState<Post[]>([]);
 
   const isOwnProfile = currentUser?.id === profileId;
 
@@ -52,7 +56,7 @@ export default function Profile() {
             profileImage: currentUser.profile.profileImage || "",
             coverImage: currentUser.profile.coverImage || "",
             skills: currentUser.profile.skills,
-            contacts: currentUser.profile.contacts
+            contacts: currentUser.profile.contacts,
           });
           setLoading(false);
           return;
@@ -82,6 +86,31 @@ export default function Profile() {
     }
   }, [profileId, currentUser, isOwnProfile]);
 
+  const fetchRepostedPosts = async () => {
+    if (!isOwnProfile || !currentUser?.id) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:4000/posts/reposted/${currentUser.id}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch liked posts");
+      const data = await res.json();
+      setRepostedPosts(data);
+    } catch (err) {
+      console.error("Error fetching liked posts:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchRepostedPosts();
+  }, [currentUser?.authId]);
+
+  const updatePost = (updatedPost: Post) => {
+    setRepostedPosts((prev) =>
+      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+    );
+  };
+
   const handleEditProfile = (formData: EditFormData) => {
     console.log(formData);
     setIsEditModalOpen(false);
@@ -91,10 +120,6 @@ export default function Profile() {
     setIsFollowing(!isFollowing);
     // TODO: API call to follow/unfollow the user
   };
-
-  //TODO - Practice data -> later with real posts
-  const likedPosts: Array<{id: string; title: string; content: string; createdAt: string}> = [];
-  const repostedPosts: Array<{id: string; title: string; content: string; createdAt: string}> = [];
 
   if (loading) return <div className="loading">Loading profile...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -109,7 +134,10 @@ export default function Profile() {
       <div className="profile-content">
         <div className="profile-header">
           <div className="profile-picture">
-            <img src={profile.profileImage || DEFAULT_IMAGES.profile} alt="Profile" />
+            <img
+              src={profile.profileImage || DEFAULT_IMAGES.profile}
+              alt="Profile"
+            />
           </div>
           <div className="profile-info">
             <div className="name-section">
@@ -146,7 +174,7 @@ export default function Profile() {
                 </>
               ) : currentUser ? (
                 <button
-                  className={`follow-button ${isFollowing ? 'following' : ''}`}
+                  className={`follow-button ${isFollowing ? "following" : ""}`}
                   onClick={handleFollowToggle}
                 >
                   {isFollowing ? (
@@ -165,7 +193,8 @@ export default function Profile() {
             </div>
             <span className="profile-role">
               {profile.userRole
-                ? profile.userRole.charAt(0).toUpperCase() + profile.userRole.slice(1)
+                ? profile.userRole.charAt(0).toUpperCase() +
+                  profile.userRole.slice(1)
                 : ""}
             </span>
           </div>
@@ -255,7 +284,7 @@ export default function Profile() {
               <div className="profile-posts">
                 {likedPosts.map((post) => (
                   <div key={post.id} className="post-card">
-                    <h3>{post.title}</h3>
+                    <h3>{post.content}</h3>
                     <p>{post.content}</p>
                     <span className="post-date">
                       {new Date(post.createdAt).toLocaleDateString()}
@@ -277,13 +306,12 @@ export default function Profile() {
             {repostedPosts.length > 0 ? (
               <div className="profile-posts">
                 {repostedPosts.map((post) => (
-                  <div key={post.id} className="post-card">
-                    <h3>{post.title}</h3>
-                    <p>{post.content}</p>
-                    <span className="post-date">
-                      {new Date(post.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onPostUpdate={updatePost}
+                    fetchPosts={fetchRepostedPosts}
+                  />
                 ))}
               </div>
             ) : (

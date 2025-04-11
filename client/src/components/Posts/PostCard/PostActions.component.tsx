@@ -5,17 +5,28 @@ import { useUser } from "../../../context/UserContext";
 interface PostActionsProps {
   post: Post;
   isLiking: boolean;
+  isReposting: boolean;
   onLike: (e: React.MouseEvent) => void;
+  onRepost: (e: React.MouseEvent) => void;
   onMark: (e: React.MouseEvent) => void;
 }
 
-export function PostActions({ post, isLiking, onLike, onMark }: PostActionsProps) {
+export function PostActions({
+  post,
+  isLiking,
+  isReposting,
+  onLike,
+  onRepost,
+  onMark,
+}: PostActionsProps) {
   const { user } = useUser();
 
   return (
     <div className="post-card-actions">
       <button
-        className={`post-card-action-button ${post.isLikedByUser ? "liked" : ""}`}
+        className={`post-card-action-button ${
+          post.isLikedByUser ? "liked" : ""
+        }`}
         onClick={onLike}
         disabled={!user || isLiking}
       >
@@ -32,8 +43,19 @@ export function PostActions({ post, isLiking, onLike, onMark }: PostActionsProps
         <span>{post.comments.length}</span>
       </button>
 
-      <button className="post-card-action-button repost-button">
-        <Repeat2 size={20} />
+      <button
+        className={`post-card-action-button ${
+          post.isRepostedByUser ? "reposted" : ""
+        }`}
+        onClick={onRepost}
+        disabled={!user || isReposting}
+      >
+        <Repeat2
+          size={20}
+          className={
+            post.isRepostedByUser ? "repost-icon reposted" : "repost-icon"
+          }
+        />
         <span>{post.repostsCount}</span>
       </button>
 

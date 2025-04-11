@@ -18,6 +18,7 @@ export interface Post {
   comments: Comment[];
   isLikedByUser?: boolean;
   isMarkedByAdmin?: boolean;
+  isRepostedByUser?: boolean;
 }
 
 export interface Comment {

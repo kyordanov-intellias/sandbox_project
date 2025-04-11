@@ -18,6 +18,7 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [isReposting, setIsReposting] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
   const handleLike = async (e: React.MouseEvent) => {
@@ -45,6 +46,34 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
       console.error("Error updating like:", error);
     } finally {
       setIsLiking(false);
+    }
+  };
+
+  const handleRepost = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user || isReposting) return;
+
+    try {
+      setIsReposting(true);
+      const action = post.isRepostedByUser ? "unrepost" : "repost";
+      const response = await fetch(
+        `http://localhost:4000/posts/${post.id}/${action}?userId=${user.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update repost status");
+      }
+
+      const updatedPost = await response.json();
+      onPostUpdate(updatedPost);
+    } catch (error) {
+      console.error("Error updating repost:", error);
+    } finally {
+      setIsReposting(false);
     }
   };
 
@@ -154,7 +183,9 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
           <PostActions
             post={post}
             isLiking={isLiking}
+            isReposting={isReposting}
             onLike={handleLike}
+            onRepost={handleRepost}
             onMark={handleMark}
           />
         </div>
