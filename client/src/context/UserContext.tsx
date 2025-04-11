@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import { getUser, logoutUser, getUserById } from "../services/userServices";
 import { User } from "../interfaces/userInterfaces";
 
@@ -17,7 +23,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const authResponse = await getUser();
       if (authResponse.ok) {
@@ -39,9 +45,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await logoutUser();
       setUser(null);
@@ -49,13 +55,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Logout failed:", error);
       setUser(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUser();
-  }, []);
-
-  //TODO useCallback
+  }, [fetchUser]);
 
   return (
     <UserContext.Provider value={{ user, loading, fetchUser, logout }}>
