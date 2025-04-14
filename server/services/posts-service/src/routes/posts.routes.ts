@@ -22,6 +22,7 @@ router.delete("/:postId", validateToken, postsController.deletePost);
 router.put("/:postId/mark", validateToken, postsController.toggleMarkByAdmin);
 
 router.post("/:id/like", validateToken, postsController.likePost);
+router.get("/liked/:userId", postsController.getLikedPostsByUser);
 router.post("/:id/dislike", validateToken, postsController.dislikePost);
 
 router.post("/:id/repost", validateToken, postsController.repostPost);
