@@ -24,7 +24,7 @@ export interface User {
     id: string;
     lastName: string;
     userRole: string;
-    profileImage?: string;
+    profileImage: string;
     coverImage?: string;
     skills: Array<{
       id: string;

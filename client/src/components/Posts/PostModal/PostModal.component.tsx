@@ -6,11 +6,12 @@ import { CreateComment } from "../CreateComment/CreateComment.component";
 import "./PostModal.styles.css";
 import { CommentActions } from "./CommentAction/CommentAction.component";
 import { useUser } from "../../../context/UserContext";
+import { usePosts } from "../../../context/PostContext";
+import { deleteCommentById, editCommentById, getPostById } from "../../../services/postService";
 
 interface PostModalProps {
   post: Post;
   onClose: () => void;
-  fetchPosts: () => void;
 }
 
 interface EditingComment {
@@ -18,24 +19,25 @@ interface EditingComment {
   content: string;
 }
 
-export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
+export function PostModal({ post, onClose }: PostModalProps) {
   const [currentPost, setCurrentPost] = useState(post);
   const [editingComment, setEditingComment] = useState<EditingComment | null>(
     null
   );
   const { user } = useUser();
+  const { updatePostInContext } = usePosts();
 
   const sortedComments = [...currentPost.comments].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  const handleCommentCreated = async () => {
+  const refreshPost = async () => {
     try {
-      fetchPosts();
-      const response = await fetch(`http://localhost:4000/posts/${post.id}`);
+      const response = await getPostById(post.id);
       if (!response.ok) throw new Error("Failed to fetch updated post");
       const updatedPost = await response.json();
       setCurrentPost(updatedPost);
+      updatePostInContext(updatedPost);
     } catch (error) {
       console.error("Error fetching updated post:", error);
     }
@@ -43,21 +45,9 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
 
   const handleEditComment = async (commentId: string, newContent: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:4000/posts/comments/${commentId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ content: newContent }),
-        }
-      );
-
+      const response = await editCommentById(commentId, newContent);
       if (!response.ok) throw new Error("Failed to update comment");
-
-      await handleCommentCreated();
+      await refreshPost();
       setEditingComment(null);
     } catch (error) {
       console.error("Error updating comment:", error);
@@ -66,16 +56,9 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:4000/posts/comments/${commentId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
+      const response = await deleteCommentById(commentId);
       if (!response.ok) throw new Error("Failed to delete comment");
-      await handleCommentCreated();
+      await refreshPost();
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -117,10 +100,7 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
 
           <p className="modal-text">{currentPost.content}</p>
 
-          <CreateComment
-            post={currentPost}
-            onCommentCreated={handleCommentCreated}
-          />
+          <CreateComment post={currentPost} onCommentCreated={refreshPost} />
 
           <div className="modal-comments">
             <h3 className="modal-comments-title">Comments</h3>
@@ -144,12 +124,12 @@ export function PostModal({ post, onClose, fetchPosts }: PostModalProps) {
                       <CommentActions
                         isAuthor={user?.id === comment.authorId}
                         isAdmin={user?.userRole === "administrator"}
-                        onEdit={() => {
+                        onEdit={() =>
                           setEditingComment({
                             id: comment.id,
                             content: comment.content,
-                          });
-                        }}
+                          })
+                        }
                         onDelete={() => handleDeleteComment(comment.id)}
                       />
                     </div>

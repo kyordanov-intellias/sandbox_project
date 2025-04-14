@@ -19,10 +19,12 @@ import { EditFormData } from "../../interfaces/userInterfaces";
 import { DEFAULT_IMAGES } from "../Register/defaultImages";
 import { getUserById } from "../../services/userServices";
 import { UserProfileInterface } from "../../interfaces/userInterfaces";
-import { PostCard } from "../Posts/PostCard/PostCard.components";
-import { Post } from "../../interfaces/postsInterfaces";
 import { Post } from "../../interfaces/postsInterfaces";
 import { PostCard } from "../Posts/PostCard/PostCard.components";
+import {
+  getLikedPostsByUserId,
+  getRepostedPostsByUserId,
+} from "../../services/postService";
 
 export default function Profile() {
   const { profileId } = useParams<{ profileId: string }>();
@@ -35,22 +37,24 @@ export default function Profile() {
     "liked"
   );
   const { user: currentUser } = useUser();
+  const [likedPostsLocal, setLikedPostsLocal] = useState<Post[]>([]);
+  const [repostedPostsLocal, setRepostedPostsLocal] = useState<Post[]>([]);
+
   const [isFollowing, setIsFollowing] = useState(false);
-  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
-  const [repostedPosts, setRepostedPosts] = useState<Post[]>([]);
-  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
-  const [repostedPosts, setRepostedPosts] = useState<Post[]>([]);
 
   const isOwnProfile = currentUser?.id === profileId;
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileAndPosts = async () => {
       setLoading(true);
       setError(null);
 
       try {
+        let userIdToFetch = profileId || "";
+        let profileData: UserProfileInterface | null = null;
+
         if (isOwnProfile && currentUser?.profile) {
-          setProfile({
+          profileData = {
             id: currentUser.profile.id,
             authId: currentUser.profile.authId || currentUser.id,
             email: currentUser.profile.email,
@@ -61,21 +65,32 @@ export default function Profile() {
             coverImage: currentUser.profile.coverImage || "",
             skills: currentUser.profile.skills,
             contacts: currentUser.profile.contacts,
-            contacts: currentUser.profile.contacts,
-          });
-          setLoading(false);
-          return;
+          };
+          userIdToFetch = currentUser.id;
+        } else {
+          const response = await getUserById(profileId || "");
+          if (!response.ok) throw new Error("Failed to fetch profile");
+          profileData = await response.json();
         }
 
-        const response = await getUserById(profileId || "");
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile");
-        }
-
-        const profileData = await response.json();
         setProfile(profileData);
+
+        const [likedRes, repostedRes] = await Promise.all([
+          getLikedPostsByUserId(userIdToFetch),
+          getRepostedPostsByUserId(userIdToFetch),
+        ]);
+
+        if (likedRes.ok) {
+          const liked = await likedRes.json();
+          setLikedPostsLocal(liked);
+        }
+
+        if (repostedRes.ok) {
+          const reposted = await repostedRes.json();
+          setRepostedPostsLocal(reposted);
+        }
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error("Error fetching profile or posts:", err);
         setError("Failed to load profile");
       } finally {
         setLoading(false);
@@ -83,63 +98,13 @@ export default function Profile() {
     };
 
     if (profileId) {
-      fetchProfile();
+      fetchProfileAndPosts();
     }
 
     if (!isOwnProfile) {
       setActiveSection("reposted");
     }
   }, [profileId, currentUser, isOwnProfile]);
-
-  const fetchLikedPosts = async () => {
-    if (!isOwnProfile || !currentUser?.id) return;
-
-    try {
-      const res = await fetch(
-        `http://localhost:4000/posts/liked/${currentUser.id}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch liked posts");
-      const data = await res.json();
-      setLikedPosts(data);
-    } catch (err) {
-      console.error("Error fetching liked posts:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchLikedPosts();
-  }, [currentUser?.id]);
-
-  const updatePost = (updatedPost: Post) => {
-    setLikedPosts((prev) =>
-      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
-    );
-  };
-
-  const fetchRepostedPosts = async () => {
-    if (!isOwnProfile || !currentUser?.id) return;
-
-    try {
-      const res = await fetch(
-        `http://localhost:4000/posts/reposted/${currentUser.id}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch liked posts");
-      const data = await res.json();
-      setRepostedPosts(data);
-    } catch (err) {
-      console.error("Error fetching liked posts:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchRepostedPosts();
-  }, [currentUser?.authId]);
-
-  const updatePost = (updatedPost: Post) => {
-    setRepostedPosts((prev) =>
-      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
-    );
-  };
 
   const handleEditProfile = (formData: EditFormData) => {
     console.log(formData);
@@ -165,11 +130,8 @@ export default function Profile() {
         <div className="profile-header">
           <div className="profile-picture">
             <img
-             
               src={profile.profileImage || DEFAULT_IMAGES.profile}
-             
               alt="Profile"
-           
             />
           </div>
           <div className="profile-info">
@@ -208,7 +170,6 @@ export default function Profile() {
               ) : currentUser ? (
                 <button
                   className={`follow-button ${isFollowing ? "following" : ""}`}
-                  className={`follow-button ${isFollowing ? "following" : ""}`}
                   onClick={handleFollowToggle}
                 >
                   {isFollowing ? (
@@ -228,7 +189,6 @@ export default function Profile() {
             <span className="profile-role">
               {profile.userRole
                 ? profile.userRole.charAt(0).toUpperCase() +
-                 
                   profile.userRole.slice(1)
                 : ""}
             </span>
@@ -315,15 +275,10 @@ export default function Profile() {
 
         {activeSection === "liked" && isOwnProfile && (
           <div className="posts-section active">
-            {likedPosts.length > 0 ? (
+            {likedPostsLocal!.length > 0 ? (
               <div className="profile-posts">
-                {likedPosts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onPostUpdate={updatePost}
-                    fetchPosts={fetchLikedPosts}
-                  />
+                {likedPostsLocal!.map((post) => (
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
             ) : (
@@ -337,15 +292,10 @@ export default function Profile() {
 
         {activeSection === "reposted" && (
           <div className="posts-section active">
-            {repostedPosts.length > 0 ? (
+            {repostedPostsLocal!.length > 0 ? (
               <div className="profile-posts">
-                {repostedPosts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onPostUpdate={updatePost}
-                    fetchPosts={fetchRepostedPosts}
-                  />
+                {repostedPostsLocal!.map((post) => (
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
             ) : (

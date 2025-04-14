@@ -42,3 +42,22 @@ export interface CreatePostRequest {
     userRole: string;
   };
 }
+
+export interface CreatePostResponce {
+  id: string;
+  authorId: string;
+  authorInfo: {
+    lastName: string;
+    userRole: string;
+    firstName: string;
+    profileImage: string;
+  };
+  content: string;
+  imageUrl: string;
+  likesCount: number;
+  repostsCount: number;
+  isMarkedByAdmin: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  comments: [];
+}

@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { Post } from "../../../interfaces/postsInterfaces";
 import { PostModal } from "../PostModal/PostModal.component";
 import { useUser } from "../../../context/UserContext";
+import { usePosts } from "../../../context/PostContext";
 import { deletePost, markPost, likePost } from "../../../services/postService";
 import { PostActions } from "./PostActions.component";
 import "./PostCard.styles.css";
@@ -11,12 +12,12 @@ import { EditPost } from "../EditPost/EditPost.component";
 
 interface PostCardProps {
   post: Post;
-  onPostUpdate: (updatedPost: Post) => void;
-  fetchPosts: () => void;
 }
 
-export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
+export function PostCard({ post }: PostCardProps) {
   const { user } = useUser();
+  const { updatePostInContext, deletePostById } = usePosts();
+
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
@@ -30,13 +31,10 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
     try {
       setIsLiking(true);
       const response = await likePost(post.id, user.id, post.isLikedByUser ?? false);
-
-      if (!response.ok) {
-        throw new Error("Failed to update like status");
-      }
+      if (!response.ok) throw new Error("Failed to update like status");
 
       const updatedPost = await response.json();
-      onPostUpdate(updatedPost);
+      updatePostInContext(updatedPost);
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
@@ -58,13 +56,10 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
           credentials: "include",
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to update repost status");
-      }
+      if (!response.ok) throw new Error("Failed to update repost status");
 
       const updatedPost = await response.json();
-      onPostUpdate(updatedPost);
+      updatePostInContext(updatedPost);
     } catch (error) {
       console.error("Error updating repost:", error);
     } finally {
@@ -75,11 +70,13 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
   const handleMark = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user || user.userRole !== "administrator") return;
+
     try {
       const response = await markPost(post.id);
       if (!response.ok) throw new Error("Failed to update mark status");
+
       const updatedPost: Post = await response.json();
-      onPostUpdate(updatedPost);
+      updatePostInContext(updatedPost);
     } catch (error) {
       console.error("Error marking post:", error);
     }
@@ -101,8 +98,9 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
       try {
         const response = await deletePost(post.id);
         if (!response.ok) throw new Error("Failed to delete post");
+
         Swal.fire("Deleted!", "Your post has been deleted.", "success");
-        fetchPosts();
+        deletePostById(post.id);
       } catch (error) {
         console.error("Error deleting post:", error);
         Swal.fire("Oops!", "Something went wrong while deleting.", "error");
@@ -189,7 +187,6 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
           <PostModal
             post={post}
             onClose={() => setIsPostModalOpen(false)}
-            fetchPosts={fetchPosts}
           />
         )}
 
@@ -197,7 +194,6 @@ export function PostCard({ post, onPostUpdate, fetchPosts }: PostCardProps) {
           <EditPost
             post={post}
             onClose={() => setIsEditModalOpen(false)}
-            fetchPosts={fetchPosts}
           />
         )}
       </div>

@@ -1,27 +1,26 @@
 import { useState } from "react";
 import { useUser } from "../../../context/UserContext";
+import { usePosts } from "../../../context/PostContext.tsx";
 import { Plus } from "lucide-react";
 import "./CreatePost.styles.css";
-import { Post } from "../../../interfaces/postsInterfaces";
 import { useNavigate } from "react-router-dom";
 import { useCloudinaryUpload } from "../../../hooks/useCloudinaryUpload";
+import { CreatePostRequest } from "../../../interfaces/postsInterfaces.ts";
 
-interface CreatePostProps {
-  onPostCreated: (post: Post) => void;
-}
-
-export default function CreatePost({ onPostCreated }: CreatePostProps) {
+export default function CreatePost() {
   const { user, logout } = useUser();
+  const { addPost } = usePosts();
   const navigate = useNavigate();
+
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const {
     uploading: uploadingImage,
     error: imageError,
-    uploadImage
+    uploadImage,
   } = useCloudinaryUpload();
 
   const handleAuthError = async () => {
@@ -33,14 +32,14 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
     e.preventDefault();
     if (!user) return;
 
-    const newPost = {
+    const newPost: CreatePostRequest = {
       content,
       imageUrl: imageUrl || undefined,
       authorId: user.id,
       authorInfo: {
-        firstName: user.profile?.firstName,
-        lastName: user.profile?.lastName,
-        profileImage: user.profile?.profileImage,
+        firstName: user.profile!.firstName,
+        lastName: user.profile!.lastName,
+        profileImage: user.profile!.profileImage,
         userRole: user.userRole,
       },
     };
@@ -64,7 +63,8 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
       }
 
       const createdPost = await response.json();
-      onPostCreated(createdPost);
+      addPost(createdPost);
+
       setContent("");
       setImageUrl("");
       setIsOpen(false);
@@ -115,7 +115,7 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
                 onChange={(e) => setContent(e.target.value)}
                 required
               />
-              
+
               <div className="image-upload-container">
                 <input
                   type="file"
