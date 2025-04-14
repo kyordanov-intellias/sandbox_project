@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Comment } from "./Comment.entity";
 import { Like } from "./Like.entity";
+import { Repost } from "./Repost.entity";
 
 @Entity("posts")
 export class Post {
@@ -40,6 +41,9 @@ export class Post {
 
   @OneToMany(() => Like, (like) => like.post)
   likes!: Like[];
+
+  @OneToMany(() => Repost, (repost) => repost.post)
+  reposts!: Repost[];
 
   @Column({ name: "likes_count", default: 0 })
   likesCount!: number;

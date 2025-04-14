@@ -1,6 +1,7 @@
 import { Context, ParameterizedContext } from "koa";
 import { postRepository } from "../repositories/posts.repository";
 import { likeRepository } from "../repositories/like.repository";
+import { repostRepository } from "../repositories/repost.repository";
 import { Post } from "../models/Post.entity";
 
 export interface CreatePostRequest {
@@ -78,9 +79,13 @@ class PostsController {
         const likes = await likeRepository.findByUserId(userId as string);
         const likedPostIds = likes.map((like) => like.postId);
 
+        const reposts = await repostRepository.findByUserId(userId as string);
+        const repostedPostIds = reposts.map((repost) => repost.postId);
+
         ctx.body = posts.map((post) => ({
           ...post,
           isLikedByUser: likedPostIds.includes(post.id),
+          isRepostedByUser: repostedPostIds.includes(post.id),
           isMarkedVByAdmin: post.isMarkedByAdmin,
         }));
       } else {
@@ -98,31 +103,31 @@ class PostsController {
   async likePost(ctx: Context) {
     const { id } = ctx.params;
     const userId = ctx.query.userId;
-  
+
     if (typeof userId !== "string" || !userId.trim()) {
       ctx.status = 400;
       ctx.body = { error: "Valid userId is required" };
       return;
     }
-  
+
     try {
       const existingLike = await likeRepository.findByPostAndUser(id, userId);
-  
+
       if (existingLike) {
         ctx.status = 400;
         ctx.body = { error: "Post already liked by user" };
         return;
       }
-  
+
       await likeRepository.create(id, userId);
       const post = await postRepository.incrementLikes(id);
-  
+
       if (!post) {
         ctx.status = 404;
         ctx.body = { error: "Post not found" };
         return;
       }
-  
+
       const postWithLikes = await postRepository.findById(id);
       ctx.body = {
         ...postWithLikes,
@@ -136,36 +141,35 @@ class PostsController {
       };
     }
   }
-  
 
   async dislikePost(ctx: Context) {
     const { id } = ctx.params;
     const userId = ctx.query.userId;
-  
+
     if (typeof userId !== "string" || !userId.trim()) {
       ctx.status = 400;
       ctx.body = { error: "Valid userId is required" };
       return;
     }
-  
+
     try {
       const existingLike = await likeRepository.findByPostAndUser(id, userId);
-  
+
       if (!existingLike) {
         ctx.status = 400;
         ctx.body = { error: "Post not liked by user" };
         return;
       }
-  
+
       await likeRepository.delete(id, userId);
       const post = await postRepository.decrementLikes(id);
-  
+
       if (!post) {
         ctx.status = 404;
         ctx.body = { error: "Post not found" };
         return;
       }
-  
+
       const postWithLikes = await postRepository.findById(id);
       ctx.body = {
         ...postWithLikes,
@@ -175,6 +179,122 @@ class PostsController {
       ctx.status = 500;
       ctx.body = {
         error: "Error unliking post",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async repostPost(ctx: Context) {
+    const { id } = ctx.params;
+    const userId = ctx.query.userId;
+
+    if (typeof userId !== "string" || !userId.trim()) {
+      ctx.status = 400;
+      ctx.body = { error: "Valid userId is required" };
+      return;
+    }
+
+    try {
+      const existingRepost = await repostRepository.findByPostAndUser(
+        id,
+        userId
+      );
+
+      if (existingRepost) {
+        ctx.status = 400;
+        ctx.body = { error: "Post already reposted by user" };
+        return;
+      }
+
+      await repostRepository.create(id, userId);
+
+      const post = await postRepository.incrementReposts(id);
+
+      if (!post) {
+        ctx.status = 404;
+        ctx.body = { error: "Post not found" };
+        return;
+      }
+
+      ctx.body = {
+        ...post,
+        isRepostedByUser: true,
+      };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = {
+        error: "Error reposting post",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async unrepostPost(ctx: Context) {
+    const { id } = ctx.params;
+    const userId = ctx.query.userId;
+
+    if (typeof userId !== "string" || !userId.trim()) {
+      ctx.status = 400;
+      ctx.body = { error: "Valid userId is required" };
+      return;
+    }
+
+    try {
+      const existingRepost = await repostRepository.findByPostAndUser(
+        id,
+        userId
+      );
+
+      if (!existingRepost) {
+        ctx.status = 400;
+        ctx.body = { error: "Post not reposted by user" };
+        return;
+      }
+
+      await repostRepository.delete(id, userId);
+      const post = await postRepository.decrementReposts(id);
+
+      if (!post) {
+        ctx.status = 404;
+        ctx.body = { error: "Post not found" };
+        return;
+      }
+
+      ctx.body = {
+        ...post,
+        isRepostedByUser: false,
+      };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = {
+        error: "Error un-reposting post",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getRepostedPostsByUser(ctx: Context) {
+    const { userId } = ctx.params;
+
+    try {
+      const reposts = await repostRepository.findByUserId(userId);
+      const repostedPostIds = reposts.map((r) => r.postId);
+
+      if (repostedPostIds.length === 0) {
+        ctx.body = [];
+        return;
+      }
+
+      const posts = await postRepository.findByIds(repostedPostIds);
+
+      ctx.body = posts.map((post) => ({
+        ...post,
+        isRepostedByUser: true,
+      }));
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = {
+        error: "Error fetching reposted posts",
         details: error instanceof Error ? error.message : "Unknown error",
       };
     }
@@ -203,7 +323,7 @@ class PostsController {
 
   async updatePost(ctx: Context) {
     const { postId } = ctx.params;
-    const updates = ctx.request.body as Partial<Post>;;
+    const updates = ctx.request.body as Partial<Post>;
 
     try {
       const updatedPost = await postRepository.update(postId, updates);

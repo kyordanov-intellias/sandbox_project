@@ -25,6 +25,10 @@ router.post("/:id/like", validateToken, postsController.likePost);
 router.get("/liked/:userId", postsController.getLikedPostsByUser);
 router.post("/:id/dislike", validateToken, postsController.dislikePost);
 
+router.post("/:id/repost", validateToken, postsController.repostPost);
+router.post("/:id/unrepost", validateToken, postsController.unrepostPost);
+router.get("/reposted/:userId", postsController.getRepostedPostsByUser);
+
 router.get("/:postId/comments", commentsController.getPostComments);
 router.post(
   "/:postId/comments",

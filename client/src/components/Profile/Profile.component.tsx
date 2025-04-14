@@ -21,6 +21,8 @@ import { getUserById } from "../../services/userServices";
 import { UserProfileInterface } from "../../interfaces/userInterfaces";
 import { PostCard } from "../Posts/PostCard/PostCard.components";
 import { Post } from "../../interfaces/postsInterfaces";
+import { Post } from "../../interfaces/postsInterfaces";
+import { PostCard } from "../Posts/PostCard/PostCard.components";
 
 export default function Profile() {
   const { profileId } = useParams<{ profileId: string }>();
@@ -34,6 +36,8 @@ export default function Profile() {
   );
   const { user: currentUser } = useUser();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const [repostedPosts, setRepostedPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [repostedPosts, setRepostedPosts] = useState<Post[]>([]);
 
@@ -56,6 +60,7 @@ export default function Profile() {
             profileImage: currentUser.profile.profileImage || "",
             coverImage: currentUser.profile.coverImage || "",
             skills: currentUser.profile.skills,
+            contacts: currentUser.profile.contacts,
             contacts: currentUser.profile.contacts,
           });
           setLoading(false);
@@ -111,6 +116,31 @@ export default function Profile() {
     );
   };
 
+  const fetchRepostedPosts = async () => {
+    if (!isOwnProfile || !currentUser?.id) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:4000/posts/reposted/${currentUser.id}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch liked posts");
+      const data = await res.json();
+      setRepostedPosts(data);
+    } catch (err) {
+      console.error("Error fetching liked posts:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchRepostedPosts();
+  }, [currentUser?.authId]);
+
+  const updatePost = (updatedPost: Post) => {
+    setRepostedPosts((prev) =>
+      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+    );
+  };
+
   const handleEditProfile = (formData: EditFormData) => {
     console.log(formData);
     setIsEditModalOpen(false);
@@ -135,8 +165,11 @@ export default function Profile() {
         <div className="profile-header">
           <div className="profile-picture">
             <img
+             
               src={profile.profileImage || DEFAULT_IMAGES.profile}
+             
               alt="Profile"
+           
             />
           </div>
           <div className="profile-info">
@@ -175,6 +208,7 @@ export default function Profile() {
               ) : currentUser ? (
                 <button
                   className={`follow-button ${isFollowing ? "following" : ""}`}
+                  className={`follow-button ${isFollowing ? "following" : ""}`}
                   onClick={handleFollowToggle}
                 >
                   {isFollowing ? (
@@ -194,6 +228,7 @@ export default function Profile() {
             <span className="profile-role">
               {profile.userRole
                 ? profile.userRole.charAt(0).toUpperCase() +
+                 
                   profile.userRole.slice(1)
                 : ""}
             </span>
@@ -305,13 +340,12 @@ export default function Profile() {
             {repostedPosts.length > 0 ? (
               <div className="profile-posts">
                 {repostedPosts.map((post) => (
-                  <div key={post.id} className="post-card">
-                    <h3>{post.content}</h3>
-                    <p>{post.content}</p>
-                    <span className="post-date">
-                      {new Date(post.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onPostUpdate={updatePost}
+                    fetchPosts={fetchRepostedPosts}
+                  />
                 ))}
               </div>
             ) : (
