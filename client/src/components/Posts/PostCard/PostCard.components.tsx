@@ -72,7 +72,7 @@ export function PostCard({ post }: PostCardProps) {
     if (!user || user.userRole !== "administrator") return;
 
     try {
-      const response = await markPost(post.id);
+      const response = await markPost(post.id, user.id);
       if (!response.ok) throw new Error("Failed to update mark status");
 
       const updatedPost: Post = await response.json();

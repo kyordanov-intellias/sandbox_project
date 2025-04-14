@@ -195,10 +195,8 @@ class PostsController {
     }
 
     try {
-      const existingRepost = await repostRepository.findByPostAndUser(
-        id,
-        userId
-      );
+      const existingRepost = await repostRepository.findByPostAndUser(id, userId);
+      const existingLike = await likeRepository.findByPostAndUser(id, userId);
 
       if (existingRepost) {
         ctx.status = 400;
@@ -207,7 +205,6 @@ class PostsController {
       }
 
       await repostRepository.create(id, userId);
-
       const post = await postRepository.incrementReposts(id);
 
       if (!post) {
@@ -219,6 +216,7 @@ class PostsController {
       ctx.body = {
         ...post,
         isRepostedByUser: true,
+        isLikedByUser: !!existingLike,
       };
     } catch (error) {
       ctx.status = 500;
@@ -303,6 +301,7 @@ class PostsController {
   async toggleMarkByAdmin(ctx: Context) {
     try {
       const postId = ctx.params.postId;
+      const userId = ctx.query.userId as string;
       const post = await postRepository.findById(postId);
 
       if (!post) {
@@ -311,11 +310,20 @@ class PostsController {
         return;
       }
 
+      const existingLike = userId ? await likeRepository.findByPostAndUser(postId, userId) : null;
+      const existingRepost = userId ? await repostRepository.findByPostAndUser(postId, userId) : null;
+
       post.isMarkedByAdmin = !post.isMarkedByAdmin;
       const updatedPost = await postRepository.save(post);
 
-      ctx.body = updatedPost;
+      ctx.body = {
+        ...updatedPost,
+        isLikedByUser: !!existingLike,
+        isRepostedByUser: !!existingRepost,
+        isMarkedByAdmin: updatedPost.isMarkedByAdmin,
+      };
     } catch (error) {
+      console.error("Error in toggleMarkByAdmin:", error);
       ctx.status = 500;
       ctx.body = { error: "Failed to toggle marked status" };
     }

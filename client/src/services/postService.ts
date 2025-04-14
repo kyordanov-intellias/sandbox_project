@@ -35,8 +35,8 @@ export const deletePost = async (postId: string) => {
   return response;
 };
 
-export const markPost = async (postId: string) => {
-  const response = await fetch(`http://localhost:4000/posts/${postId}/mark`, {
+export const markPost = async (postId: string, userId: string) => {
+  const response = await fetch(`http://localhost:4000/posts/${postId}/mark?userId=${userId}`, {
     method: "PUT",
     credentials: "include",
   });

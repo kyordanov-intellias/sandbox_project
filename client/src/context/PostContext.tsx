@@ -43,9 +43,19 @@ export const PostProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updatePostInContext = (updatedPost: Post) => {
-    setPosts(
-      (prev) =>
-        prev?.map((p) => (p.id === updatedPost.id ? updatedPost : p)) || null
+    setPosts((prev) =>
+      prev?.map((p) => {
+        if (p.id === updatedPost.id) {
+          return {
+            ...p,
+            ...updatedPost,
+            isLikedByUser: updatedPost.isLikedByUser ?? p.isLikedByUser,
+            isRepostedByUser: updatedPost.isRepostedByUser ?? p.isRepostedByUser,
+            isMarkedByAdmin: updatedPost.isMarkedByAdmin ?? p.isMarkedByAdmin,
+          };
+        }
+        return p;
+      }) || null
     );
 
     setLikedPosts((prev) =>
