@@ -77,6 +77,15 @@ class PostRepository {
     const result = await this.repository.delete(id);
     return result.affected ? result.affected > 0 : false;
   }
+
+  async findByIds(ids: string[]): Promise<Post[]> {
+    return this.repository
+      .createQueryBuilder("post")
+      .leftJoinAndSelect("post.comments", "comments")
+      .where("post.id IN (:...ids)", { ids })
+      .orderBy("post.created_at", "DESC")
+      .getMany();
+  }
 }
 
 export const postRepository = new PostRepository();

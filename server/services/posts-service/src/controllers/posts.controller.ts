@@ -246,6 +246,35 @@ class PostsController {
       };
     }
   }
+
+  async getLikedPostsByUser(ctx: Context) {
+    const { userId } = ctx.params;
+  
+    try {
+      const likes = await likeRepository.findByUserId(userId);
+      const likedPostIds = likes.map((like) => like.postId);
+  
+      if (likedPostIds.length === 0) {
+        ctx.body = [];
+        return;
+      }
+  
+      const likedPosts = await postRepository.findByIds(likedPostIds);
+  
+      const postsWithLikeFlag = likedPosts.map((post) => ({
+        ...post,
+        isLikedByUser: true,
+      }));
+  
+      ctx.body = postsWithLikeFlag;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = {
+        error: "Error fetching liked posts",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
 }
 
 export const postsController = new PostsController();
