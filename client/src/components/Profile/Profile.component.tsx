@@ -9,8 +9,6 @@ import {
   Repeat,
   HeartOff,
   Repeat as RepeatOff,
-  UserPlus,
-  UserMinus,
 } from "lucide-react";
 import "./Profile.styles.css";
 import { useUser } from "../../context/UserContext";
@@ -111,11 +109,6 @@ export default function Profile() {
     setIsEditModalOpen(false);
   };
 
-  const handleFollowToggle = () => {
-    setIsFollowing(!isFollowing);
-    // TODO: API call to follow/unfollow the user
-  };
-
   if (loading) return <div className="loading">Loading profile...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!profile) return <div className="error">Profile not found</div>;
@@ -167,23 +160,6 @@ export default function Profile() {
                     </div>
                   )}
                 </>
-              ) : currentUser ? (
-                <button
-                  className={`follow-button ${isFollowing ? "following" : ""}`}
-                  onClick={handleFollowToggle}
-                >
-                  {isFollowing ? (
-                    <>
-                      <UserMinus size={18} />
-                      Unfollow
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus size={18} />
-                      Follow
-                    </>
-                  )}
-                </button>
               ) : null}
             </div>
             <span className="profile-role">

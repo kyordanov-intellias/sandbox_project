@@ -2,10 +2,12 @@ import { Context, Request } from "koa";
 import { postsController } from "../controllers/posts.controller";
 import { postRepository } from "../repositories/posts.repository";
 import { likeRepository } from "../repositories/like.repository";
+import { repostRepository } from "../repositories/repost.repository";
 import { CreatePostRequest, PostContext } from "../controllers/posts.controller";
 
 jest.mock("../repositories/posts.repository");
 jest.mock("../repositories/like.repository");
+jest.mock("../repositories/repost.repository");
 
 describe("PostsController", () => {
   let mockCtx: Partial<PostContext>;
@@ -89,7 +91,7 @@ describe("PostsController", () => {
 
   describe("getPost", () => {
     it("should return a post when found", async () => {
-      mockCtx.params = { id: "123" };
+      mockCtx.params = { postId: "123" };
       (postRepository.findById as jest.Mock).mockResolvedValue(mockPost);
 
       await postsController.getPost(mockCtx as Context);
@@ -100,7 +102,7 @@ describe("PostsController", () => {
     });
 
     it("should return 404 when post is not found", async () => {
-      mockCtx.params = { id: "123" };
+      mockCtx.params = { postId: "123" };
       (postRepository.findById as jest.Mock).mockResolvedValue(null);
 
       await postsController.getPost(mockCtx as Context);
@@ -171,6 +173,126 @@ describe("PostsController", () => {
       expect(mockCtx.status).toBe(400);
       expect(mockCtx.body).toEqual({ error: "Post not liked by user" });
       expect(likeRepository.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("repostPost", () => {
+    it("should repost a post successfully", async () => {
+      mockCtx.params = { id: "123" };
+      mockCtx.query = { userId: "user123" };
+      (repostRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+      (repostRepository.create as jest.Mock).mockResolvedValue({});
+      (postRepository.incrementReposts as jest.Mock).mockResolvedValue(mockPost);
+      (likeRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+
+      await postsController.repostPost(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(200);
+      expect(mockCtx.body).toEqual({
+        ...mockPost,
+        isRepostedByUser: true,
+        isLikedByUser: false
+      });
+      expect(repostRepository.create).toHaveBeenCalledWith("123", "user123");
+    });
+
+    it("should return 400 when post is already reposted", async () => {
+      mockCtx.params = { id: "123" };
+      mockCtx.query = { userId: "user123" };
+      (repostRepository.findByPostAndUser as jest.Mock).mockResolvedValue({});
+
+      await postsController.repostPost(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(400);
+      expect(mockCtx.body).toEqual({ error: "Post already reposted by user" });
+      expect(repostRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("unrepostPost", () => {
+    it("should unrepost a post successfully", async () => {
+      mockCtx.params = { id: "123" };
+      mockCtx.query = { userId: "user123" };
+      (repostRepository.findByPostAndUser as jest.Mock).mockResolvedValue({});
+      (repostRepository.delete as jest.Mock).mockResolvedValue(true);
+      (postRepository.decrementReposts as jest.Mock).mockResolvedValue(mockPost);
+
+      await postsController.unrepostPost(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(200);
+      expect(mockCtx.body).toEqual({
+        ...mockPost,
+        isRepostedByUser: false
+      });
+      expect(repostRepository.delete).toHaveBeenCalledWith("123", "user123");
+    });
+
+    it("should return 400 when post is not reposted", async () => {
+      mockCtx.params = { id: "123" };
+      mockCtx.query = { userId: "user123" };
+      (repostRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+
+      await postsController.unrepostPost(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(400);
+      expect(mockCtx.body).toEqual({ error: "Post not reposted by user" });
+      expect(repostRepository.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("toggleMarkByAdmin", () => {
+    it("should mark a post as admin-marked successfully", async () => {
+      mockCtx.params = { postId: "123" };
+      mockCtx.query = { userId: "admin123" };
+      const markedPost = { ...mockPost, isMarkedByAdmin: true };
+      (postRepository.findById as jest.Mock).mockResolvedValue(mockPost);
+      (likeRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+      (repostRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+      (postRepository.save as jest.Mock).mockResolvedValue(markedPost);
+
+      await postsController.toggleMarkByAdmin(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(200);
+      expect(mockCtx.body).toEqual({
+        ...markedPost,
+        isLikedByUser: false,
+        isRepostedByUser: false,
+        isMarkedByAdmin: true
+      });
+      expect(postRepository.save).toHaveBeenCalled();
+    });
+
+    it("should unmark a post successfully", async () => {
+      mockCtx.params = { postId: "123" };
+      mockCtx.query = { userId: "admin123" };
+      const unmarkedPost = { ...mockPost, isMarkedByAdmin: false };
+      (postRepository.findById as jest.Mock).mockResolvedValue({ ...mockPost, isMarkedByAdmin: true });
+      (likeRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+      (repostRepository.findByPostAndUser as jest.Mock).mockResolvedValue(null);
+      (postRepository.save as jest.Mock).mockResolvedValue(unmarkedPost);
+
+      await postsController.toggleMarkByAdmin(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(200);
+      expect(mockCtx.body).toEqual({
+        ...unmarkedPost,
+        isLikedByUser: false,
+        isRepostedByUser: false,
+        isMarkedByAdmin: false
+      });
+      expect(postRepository.save).toHaveBeenCalled();
+    });
+
+    it("should return 404 when post is not found", async () => {
+      mockCtx.params = { postId: "123" };
+      mockCtx.query = { userId: "admin123" };
+      (postRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await postsController.toggleMarkByAdmin(mockCtx as Context);
+
+      expect(mockCtx.status).toBe(404);
+      expect(mockCtx.body).toEqual({ error: "Post not found" });
+      expect(postRepository.save).not.toHaveBeenCalled();
     });
   });
 }); 
