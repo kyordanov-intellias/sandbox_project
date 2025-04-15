@@ -8,6 +8,7 @@ import Register from "./components/Register/Register.component";
 import PrivateRoute from "./components/Route-Guards/PrivateRoute/PrivateRoute.component";
 import AuthRoute from "./components/Route-Guards/AuthRoute/AuthRoute.component";
 import Profile from "./components/Profile/Profile.component";
+import { Chat } from "./components/Chat/Chat.component";
 
 const Posts = lazy(() => import("./components/Posts/Posts.components"));
 const Admin = lazy(() => import("./components/Admin/Admin.component"));
@@ -23,7 +24,7 @@ function App() {
           path="/messenger"
           element={
             <PrivateRoute>
-              <div>Chat</div>
+              <Chat />
             </PrivateRoute>
           }
         />
