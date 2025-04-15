@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/koa": "^2.14.0",
     "@types/koa__cors": "^5.0.0",
     "@types/koa__router": "^12.0.4",
@@ -36,4 +37,4 @@
     "typescript": "^5.3.3"
   },
   "type": "commonjs"
-} 
+}

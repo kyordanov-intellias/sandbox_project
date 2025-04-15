@@ -4,10 +4,12 @@ import { MessageData, TypingData } from '../types/socket.types';
 import { User } from '../types/user.types';
 
 export const setupSocketHandlers = (io: Server) => {
+    const roomUsers: Map<number, Map<string, string>> = new Map();
+
     io.on('connection', (socket: Socket) => {
         console.log('User connected:', socket.id);
-
-        socket.on('join_room', async (roomId: number) => {
+        
+        socket.on('join_room', async (roomId: number, username?: string) => {
             try {
                 if (typeof roomId !== 'number') {
                     socket.emit('error', { message: 'Invalid room ID' });
@@ -16,9 +18,15 @@ export const setupSocketHandlers = (io: Server) => {
 
                 socket.join(`room:${roomId}`);
                 console.log(`User ${socket.id} joined room ${roomId}`);
+
+                if (username) {
+                    if (!roomUsers.has(roomId)) roomUsers.set(roomId, new Map());
+                    roomUsers.get(roomId)!.set(socket.id, username);
+                }
                 
                 socket.to(`room:${roomId}`).emit('user_joined', {
                     userId: socket.id,
+                    username: username || 'Unknown',
                     roomId
                 });
             } catch (error) {
@@ -38,9 +46,17 @@ export const setupSocketHandlers = (io: Server) => {
 
                 socket.leave(`room:${roomId}`);
                 console.log(`User ${socket.id} left room ${roomId}`);
+
+                let username = 'Unknown';
+                if (roomUsers.has(roomId)) {
+                    const userMap = roomUsers.get(roomId)!;
+                    username = userMap.get(socket.id) || 'Unknown';
+                    userMap.delete(socket.id);
+                }
                 
                 socket.to(`room:${roomId}`).emit('user_left', {
                     userId: socket.id,
+                    username,
                     roomId
                 });
             } catch (error) {
@@ -96,25 +112,6 @@ export const setupSocketHandlers = (io: Server) => {
             } catch (error) {
                 socket.emit('error', {
                     message: 'Failed to send message',
-                    details: error instanceof Error ? error.message : 'Unknown error'
-                });
-            }
-        });
-
-        socket.on('typing', (data: TypingData) => {
-            try {
-                if (typeof data.roomId !== 'number' || typeof data.isTyping !== 'boolean') {
-                    socket.emit('error', { message: 'Invalid typing data' });
-                    return;
-                }
-
-                socket.to(`room:${data.roomId}`).emit('typing_status', {
-                    userId: socket.id,
-                    isTyping: data.isTyping
-                });
-            } catch (error) {
-                socket.emit('error', {
-                    message: 'Failed to update typing status',
                     details: error instanceof Error ? error.message : 'Unknown error'
                 });
             }

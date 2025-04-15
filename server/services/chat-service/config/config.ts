@@ -16,6 +16,9 @@ export const configChatFile = {
     secret: process.env.AUTH_SERVICE_JWT_SECRET || "your-auth-secret-key",
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173"
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
   }
 };

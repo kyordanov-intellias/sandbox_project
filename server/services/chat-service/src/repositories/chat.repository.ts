@@ -33,6 +33,37 @@ class ChatRepository {
             order: { createdAt: 'ASC' }
         });
     }
+
+    async getMessageById(messageId: string): Promise<Message | null> {
+        return await this.messageRepository.findOne({
+            where: { id: messageId }
+        });
+    }
+
+    async updateMessage(messageId: string, content: string): Promise<Message> {
+        const message = await this.messageRepository.findOne({
+            where: { id: messageId }
+        });
+
+        if (!message) {
+            throw new Error('Message not found');
+        }
+
+        message.content = content;
+        return await this.messageRepository.save(message);
+    }
+
+    async deleteMessage(messageId: string): Promise<void> {
+        const message = await this.messageRepository.findOne({
+            where: { id: messageId }
+        });
+
+        if (!message) {
+            throw new Error('Message not found');
+        }
+
+        await this.messageRepository.remove(message);
+    }
 }
 
 export const chatRepository = new ChatRepository(); 

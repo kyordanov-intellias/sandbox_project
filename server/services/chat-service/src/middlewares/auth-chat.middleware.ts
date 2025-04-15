@@ -4,7 +4,7 @@ import { configChatFile } from '../../config/config';
 
 export const validateToken = async (ctx: Context, next: Next) => {
     try {
-        const token = ctx.headers.authorization?.split(' ')[1];
+        const token = ctx.cookies.get('authToken');
         
         if (!token) {
             ctx.status = 401;
@@ -13,6 +13,7 @@ export const validateToken = async (ctx: Context, next: Next) => {
         }
 
         const decoded = jwt.verify(token, configChatFile.jwt.secret);
+        console.log('Decoded token:', decoded);
         ctx.state.user = decoded;
         
         await next();
