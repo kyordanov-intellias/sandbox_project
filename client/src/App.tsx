@@ -23,7 +23,7 @@ function App() {
           path="/messenger"
           element={
             <PrivateRoute>
-              <h1>Messenger Page</h1>
+              <div>Chat</div>
             </PrivateRoute>
           }
         />

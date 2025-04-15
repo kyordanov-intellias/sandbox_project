@@ -38,6 +38,14 @@ app.use(
   })
 );
 
+app.use(
+  proxy("/chat", {
+    target: "http://chat-service:4004",
+    changeOrigin: true,
+    logs: true,
+  })
+);
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 
