@@ -12,9 +12,10 @@ import { EditPost } from "../EditPost/EditPost.component";
 
 interface PostCardProps {
   post: Post;
+  onUpdate: (updatedPost: Post) => void;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, onUpdate }: PostCardProps) {
   const { user } = useUser();
   const { updatePostInContext, deletePostById } = usePosts();
 
@@ -35,6 +36,7 @@ export function PostCard({ post }: PostCardProps) {
 
       const updatedPost = await response.json();
       updatePostInContext(updatedPost);
+      if (onUpdate) onUpdate(updatedPost);
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
@@ -60,6 +62,7 @@ export function PostCard({ post }: PostCardProps) {
 
       const updatedPost = await response.json();
       updatePostInContext(updatedPost);
+      if (onUpdate) onUpdate(updatedPost);
     } catch (error) {
       console.error("Error updating repost:", error);
     } finally {

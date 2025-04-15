@@ -38,8 +38,6 @@ export default function Profile() {
   const [likedPostsLocal, setLikedPostsLocal] = useState<Post[]>([]);
   const [repostedPostsLocal, setRepostedPostsLocal] = useState<Post[]>([]);
 
-  const [isFollowing, setIsFollowing] = useState(false);
-
   const isOwnProfile = currentUser?.id === profileId;
 
   useEffect(() => {
@@ -107,6 +105,15 @@ export default function Profile() {
   const handleEditProfile = (formData: EditFormData) => {
     console.log(formData);
     setIsEditModalOpen(false);
+  };
+
+  const handleUpdateLocalPost = (updatedPost: Post) => {
+    setLikedPostsLocal((prev) =>
+      prev.map((p) => (p.id === updatedPost.id ? updatedPost : p))
+    );
+    setRepostedPostsLocal((prev) =>
+      prev.map((p) => (p.id === updatedPost.id ? updatedPost : p))
+    );
   };
 
   if (loading) return <div className="loading">Loading profile...</div>;
@@ -254,7 +261,7 @@ export default function Profile() {
             {likedPostsLocal!.length > 0 ? (
               <div className="profile-posts">
                 {likedPostsLocal!.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard key={post.id} post={post} onUpdate={handleUpdateLocalPost} />
                 ))}
               </div>
             ) : (
@@ -271,7 +278,7 @@ export default function Profile() {
             {repostedPostsLocal!.length > 0 ? (
               <div className="profile-posts">
                 {repostedPostsLocal!.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard key={post.id} post={post} onUpdate={handleUpdateLocalPost} />
                 ))}
               </div>
             ) : (
